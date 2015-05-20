@@ -17,9 +17,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.net.Uri;
 
 
-public class TabbedActivity extends ActionBarActivity implements ActionBar.TabListener {
+public class TabbedActivity extends ActionBarActivity implements ActionBar.TabListener, ChatFragment.OnFragmentInteractionListener, ContactFragment.OnFragmentInteractionListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -128,7 +129,17 @@ public class TabbedActivity extends ActionBarActivity implements ActionBar.TabLi
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            //return PlaceholderFragment.newInstance(position + 1);
+
+            switch (position) {
+                case 0:
+                    return ChatFragment.newInstance();
+                case 1:
+                    return ContactFragment.newInstance();
+                default:
+                    return PlaceholderFragment.newInstance(0);
+            }
+
         }
 
         @Override
@@ -142,9 +153,9 @@ public class TabbedActivity extends ActionBarActivity implements ActionBar.TabLi
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return getString(R.string.title_section1).toUpperCase(l);
+                    return getString(R.string.title_section_chats).toUpperCase(l);
                 case 1:
-                    return getString(R.string.title_section2).toUpperCase(l);
+                    return getString(R.string.title_section_contacts).toUpperCase(l);
             }
             return null;
         }
@@ -181,6 +192,10 @@ public class TabbedActivity extends ActionBarActivity implements ActionBar.TabLi
             View rootView = inflater.inflate(R.layout.fragment_tabbed, container, false);
             return rootView;
         }
+    }
+
+    public void onFragmentInteraction(Uri uri) {
+
     }
 
 }
