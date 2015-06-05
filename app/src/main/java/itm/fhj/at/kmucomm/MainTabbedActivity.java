@@ -2,6 +2,7 @@ package itm.fhj.at.kmucomm;
 
 import java.util.Locale;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -10,17 +11,25 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.net.Uri;
+
+import itm.fhj.at.kmucomm.activity.ChatDetailActivity;
+import itm.fhj.at.kmucomm.activity.ContactDetailActivity;
+import itm.fhj.at.kmucomm.activity.SettingsActivity;
+import itm.fhj.at.kmucomm.fragment.ChatListFragment;
+import itm.fhj.at.kmucomm.fragment.ContactListFragment;
+import itm.fhj.at.kmucomm.model.Chat;
+import itm.fhj.at.kmucomm.model.Contact;
 
 
-public class TabbedActivity extends ActionBarActivity implements ActionBar.TabListener, ChatFragment.OnFragmentInteractionListener, ContactFragment.OnFragmentInteractionListener {
+public class MainTabbedActivity extends ActionBarActivity implements
+        ActionBar.TabListener,
+        ChatListFragment.OnChatSelectedListener,
+        ContactListFragment.OnContactSelectedListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -36,6 +45,9 @@ public class TabbedActivity extends ActionBarActivity implements ActionBar.TabLi
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
+
+    ChatListFragment chatListFragment;
+    ContactListFragment contactListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +87,10 @@ public class TabbedActivity extends ActionBarActivity implements ActionBar.TabLi
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
         }
+
+        // get instances of ChatListFragment and ContactListFragment
+        chatListFragment = ChatListFragment.newInstance();
+        contactListFragment = ContactListFragment.newInstance();
     }
 
 
@@ -94,6 +110,7 @@ public class TabbedActivity extends ActionBarActivity implements ActionBar.TabLi
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            openSettings();
             return true;
         }
 
@@ -133,9 +150,9 @@ public class TabbedActivity extends ActionBarActivity implements ActionBar.TabLi
 
             switch (position) {
                 case 0:
-                    return ChatFragment.newInstance();
+                    return chatListFragment;
                 case 1:
-                    return ContactFragment.newInstance();
+                    return contactListFragment;
                 default:
                     return PlaceholderFragment.newInstance(0);
             }
@@ -194,8 +211,38 @@ public class TabbedActivity extends ActionBarActivity implements ActionBar.TabLi
         }
     }
 
-    public void onFragmentInteraction(Uri uri) {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ChatDetailActivity.REQUEST_CODE_CHAT_DETAIL && resultCode == RESULT_OK) {
+            // CHAT DETAIL
 
+            // update the fragment
+            chatListFragment.updateFragment();
+        } else if (requestCode == ContactDetailActivity.REQUEST_CODE_CONTACT_DETAIL && resultCode == RESULT_OK) {
+            // CONTACT DETAIL
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @Override
+    public void onChatSelected(Chat selectedChat) {
+        Intent chatDetailIntent = new Intent(this, ChatDetailActivity.class);
+        chatDetailIntent.putExtra(ChatDetailActivity.EXTRA_MESSAGE, selectedChat);
+
+        startActivityForResult(chatDetailIntent, ChatDetailActivity.REQUEST_CODE_CHAT_DETAIL);
+    }
+
+    @Override
+    public void onContactSelected(Contact selectedContact) {
+        Intent contactDetailIntent = new Intent(this, ContactDetailActivity.class);
+        contactDetailIntent.putExtra(ContactDetailActivity.EXTRA_MESSAGE, selectedContact);
+
+        startActivityForResult(contactDetailIntent, ContactDetailActivity.REQUEST_CODE_CONTACT_DETAIL);
+    }
+
+    public void openSettings() {
+        Intent settingsIntent = new Intent(this, SettingsActivity.class);
+        startActivity(settingsIntent);
+    }
 }

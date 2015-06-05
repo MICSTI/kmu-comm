@@ -11,4 +11,19 @@
     <string name="title_chat_fragment">Chat fragment</string>
     <string name="title_contact_fragment">Contact fragment</string>
 
+    <string name="action_chats">Chats</string>
+    <string name="action_contacts">Contacts</string>
+    <string name="title_activity_chat">ChatActivity</string>
+    <string name="title_activity_contact">ContactActivity</string>
+    <string name="empty_text">Here comes some text...</string>
+    <string name="title_activity_contact_detail">Contact Detail</string>
+    <string name="title_activity_chat_detail">ChatDetailActivity</string>
+
+    <string name="lbl_ok">Ok</string>
+    <string name="lbl_username">User name</string>
+    <string name="lbl_password">Password</string>
+
+    <string name="desc_username">Your user name</string>
+    <string name="desc_password">Your password</string>
+
 </resources>

@@ -1,0 +1,38 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="itm.fhj.at.dummyapp.activity.ChatDetailActivity">
+
+    <ListView
+        android:id ="@+id/message_list"
+        android:layout_width ="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_above="@+id/footer" />
+
+    <LinearLayout
+        android:id="@+id/footer"
+        android:orientation ="horizontal"
+        android:layout_width ="match_parent"
+        android:layout_height ="wrap_content"
+        android:layout_alignParentBottom="true" >
+
+        <EditText
+            android:id ="@+id/message_text"
+            android:layout_width ="0dp"
+            android:layout_height ="wrap_content"
+            android:layout_weight ="100" />
+
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/lbl_ok"  >
+        </Button>
+
+    </LinearLayout>
+
+</RelativeLayout>
