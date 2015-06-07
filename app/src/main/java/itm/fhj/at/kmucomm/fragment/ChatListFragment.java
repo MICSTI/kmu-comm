@@ -1,14 +1,10 @@
 package itm.fhj.at.kmucomm.fragment;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.text.Layout;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +19,6 @@ import itm.fhj.at.kmucomm.R;
 import itm.fhj.at.kmucomm.adapter.ChatListAdapter;
 import itm.fhj.at.kmucomm.data.DummyDataAccessor;
 import itm.fhj.at.kmucomm.model.Chat;
-import itm.fhj.at.kmucomm.activity.ChatDetailActivity;
 
 
 public class ChatListFragment extends Fragment {
@@ -61,7 +56,7 @@ public class ChatListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         fActivity = (FragmentActivity) super.getActivity();
 
-        rLayout = (RelativeLayout) inflater.inflate(R.layout.activity_chat_list, container, false);
+        rLayout = (RelativeLayout) inflater.inflate(R.layout.fragment_chat_list, container, false);
 
         List<Chat> chatList = DummyDataAccessor.getInstance().getChats();
 

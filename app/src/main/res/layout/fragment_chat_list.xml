@@ -1,9 +1,11 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="itm.fhj.at.kmucomm.old.ChatFragment">
+    android:layout_height="match_parent"
+    tools:context="itm.fhj.at.dummyapp.activity.ChatListActivity">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-        android:text="@string/title_chat_fragment" />
+    <ListView
+        android:id ="@+id/chat_list"
+        android:layout_width ="fill_parent"
+        android:layout_height ="wrap_content" />
 
-</FrameLayout>
+</RelativeLayout>

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +55,7 @@ public class ContactListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         fActivity = (FragmentActivity) super.getActivity();
 
-        rLayout = (RelativeLayout) inflater.inflate(R.layout.activity_contact_list, container, false);
+        rLayout = (RelativeLayout) inflater.inflate(R.layout.fragment_contact_list, container, false);
 
         // array list containing all contacts to be displayed
         List<Contact> contacts = DummyDataAccessor.getInstance().getContacts();
