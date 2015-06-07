@@ -1,4 +1,4 @@
-package itm.fhj.at.kmucomm;
+package itm.fhj.at.kmucomm.activity;
 
 import java.util.Locale;
 
@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import itm.fhj.at.kmucomm.R;
 import itm.fhj.at.kmucomm.activity.ChatDetailActivity;
 import itm.fhj.at.kmucomm.activity.ContactDetailActivity;
 import itm.fhj.at.kmucomm.activity.SettingsActivity;
@@ -26,7 +27,7 @@ import itm.fhj.at.kmucomm.model.Chat;
 import itm.fhj.at.kmucomm.model.Contact;
 
 
-public class MainTabbedActivity extends ActionBarActivity implements
+public class MainActivity extends ActionBarActivity implements
         ActionBar.TabListener,
         ChatListFragment.OnChatSelectedListener,
         ContactListFragment.OnContactSelectedListener {
@@ -52,7 +53,7 @@ public class MainTabbedActivity extends ActionBarActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tabbed);
+        setContentView(R.layout.activity_main);
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
