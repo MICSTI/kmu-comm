@@ -34,8 +34,8 @@ public class ContactListAdapter extends ArrayAdapter<Contact> {
         }
 
         // get views to add actual data values
-        ImageView contactImage = (ImageView) convertView.findViewById(R.id.contactImage);
-        TextView contactName = (TextView) convertView.findViewById(R.id.contactName);
+        ImageView contactImage = (ImageView) convertView.findViewById(R.id.contact_image);
+        TextView contactName = (TextView) convertView.findViewById(R.id.contact_name);
 
         // add the values to the views
         contactName.setText(contact.getFirstName() + " " + contact.getLastName());

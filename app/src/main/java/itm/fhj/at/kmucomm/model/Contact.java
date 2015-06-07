@@ -23,8 +23,11 @@ public class Contact implements Serializable {
     }
 
     public String getName() {
-        // TODO: Maybe show only first name if possible (i.e. if there is only one contact in the chat with the same first name)
         return getFirstName();
+    }
+
+    public String getFullName() {
+        return getFirstName() + " " + getLastName();
     }
 
     @Override

@@ -23,21 +23,28 @@ public class DummyData implements DataInterface {
         flo.setId(1);
         flo.setFirstName("Florian");
         flo.setLastName("Mayerhofer");
+        flo.setDepartment("ITM");
+        flo.setEmail("florian.mayerhofer@edu.fh-joanneum.at");
 
         Contact andi = new Contact();
         andi.setId(2);
         andi.setFirstName("Andreas");
         andi.setLastName("Höffernig");
+        andi.setDepartment("ITM");
 
         Contact kevin = new Contact();
         kevin.setId(3);
         kevin.setFirstName("Kevin");
         kevin.setLastName("Pfeifer");
+        kevin.setDepartment("ITM");
 
         Contact michi = new Contact();
         michi.setId(4);
         michi.setFirstName("Michael");
         michi.setLastName("Stifter");
+        michi.setEmail("michael.stifter2@edu.fh-joanneum.at");
+        michi.setPhone("0664/1234567");
+        michi.setDepartment("ITM");
 
         contacts.add(flo);
         contacts.add(andi);

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -27,12 +28,32 @@ public class ContactDetailActivity extends ActionBarActivity {
         // get contact from intent extra
         contact = (Contact) getIntent().getSerializableExtra(EXTRA_MESSAGE);
 
+        // show contact name in action bar
+        setTitle(contact.getFullName());
+
         // get elements to show actual data
-        ImageView contactImage = (ImageView) findViewById(R.id.contactImage);
-        TextView contactName = (TextView) findViewById(R.id.contactName);
+        TextView contactDepartment = (TextView) findViewById(R.id.contact_department);
+        TextView contactPhone = (TextView) findViewById(R.id.contact_phone);
+        TextView contactEmail = (TextView) findViewById(R.id.contact_email);
 
         // add the values to the views
-        contactName.setText(contact.getFirstName() + " " + contact.getLastName());
+        if (contact.getDepartment() != null) {
+            contactDepartment.setText(getString(R.string.lbl_department) + ": " + contact.getDepartment());
+        } else {
+            contactDepartment.setVisibility(View.GONE);
+        }
+
+        if (contact.getPhone() != null) {
+            contactPhone.setText(getString(R.string.lbl_phone) + ": " + contact.getPhone());
+        } else {
+            contactPhone.setVisibility(View.GONE);
+        }
+
+        if (contact.getEmail() != null) {
+            contactEmail.setText(getString(R.string.lbl_email) + ": " + contact.getEmail());
+        } else {
+            contactEmail.setVisibility(View.GONE);
+        }
     }
 
 

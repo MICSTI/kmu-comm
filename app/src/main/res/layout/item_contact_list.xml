@@ -4,14 +4,14 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/contactImage"
+        android:id="@+id/contact_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="12dip"
         android:src="@drawable/ic_action" />
 
     <TextView
-        android:id="@+id/contactName"
+        android:id="@+id/contact_name"
         android:text="@string/empty_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -26,4 +26,8 @@
     <string name="desc_username">Your user name</string>
     <string name="desc_password">Your password</string>
 
+    <string name="lbl_department">Department</string>
+    <string name="lbl_phone">Phone</string>
+    <string name="lbl_email">E-Mail</string>
+
 </resources>
