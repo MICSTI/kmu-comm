@@ -9,13 +9,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.List;
 
 import itm.fhj.at.kmucomm.R;
 import itm.fhj.at.kmucomm.adapter.ContactListAdapter;
+import itm.fhj.at.kmucomm.api.CallAPI;
+import itm.fhj.at.kmucomm.api.ContactProvider;
 import itm.fhj.at.kmucomm.data.DummyDataAccessor;
 import itm.fhj.at.kmucomm.model.Contact;
 
@@ -31,6 +35,11 @@ public class ContactListFragment extends Fragment {
     private ListView contactList;
 
     private ContactListAdapter contactListAdapter;
+
+    private CallAPI callAPI;
+
+    private Button btnRetrieveUsers;
+    private TextView txtUsersResponse;
 
     public static ContactListFragment newInstance() {
         ContactListFragment fragment = new ContactListFragment();
@@ -78,6 +87,24 @@ public class ContactListFragment extends Fragment {
 
         // set adapter
         this.contactList.setAdapter(this.contactListAdapter);
+
+        btnRetrieveUsers = (Button) rLayout.findViewById(R.id.btn_retrieve_users);
+        txtUsersResponse = (TextView) rLayout.findViewById(R.id.txt_users_response);
+
+
+
+        btnRetrieveUsers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ContactProvider.getInstance().update(new ContactProvider.ContactActionListener() {
+                    @Override
+                    public void onUpdated(String s) {
+                        txtUsersResponse.setText(s);
+                    }
+                });
+                //txtUsersResponse.setText("Pretty please!");
+            }
+        });
 
         // we must return the loaded layout
         return rLayout;
