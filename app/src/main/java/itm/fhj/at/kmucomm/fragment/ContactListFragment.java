@@ -9,16 +9,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import itm.fhj.at.kmucomm.R;
 import itm.fhj.at.kmucomm.adapter.ContactListAdapter;
-import itm.fhj.at.kmucomm.api.CallAPI;
 import itm.fhj.at.kmucomm.api.ContactProvider;
 import itm.fhj.at.kmucomm.data.DummyDataAccessor;
 import itm.fhj.at.kmucomm.model.Contact;
@@ -34,12 +35,9 @@ public class ContactListFragment extends Fragment {
 
     private ListView contactList;
 
+    private List<Contact> contacts;
+
     private ContactListAdapter contactListAdapter;
-
-    private CallAPI callAPI;
-
-    private Button btnRetrieveUsers;
-    private TextView txtUsersResponse;
 
     public static ContactListFragment newInstance() {
         ContactListFragment fragment = new ContactListFragment();
@@ -67,7 +65,7 @@ public class ContactListFragment extends Fragment {
         rLayout = (RelativeLayout) inflater.inflate(R.layout.fragment_contact_list, container, false);
 
         // array list containing all contacts to be displayed
-        List<Contact> contacts = DummyDataAccessor.getInstance().getContacts();
+        contacts = ContactProvider.getInstance().getContacts();
 
         // get list view
         this.contactList = (ListView) rLayout.findViewById(R.id.contact_list);
@@ -83,26 +81,19 @@ public class ContactListFragment extends Fragment {
         });
 
         // create adapter
-        this.contactListAdapter = new ContactListAdapter(fActivity, contacts);
+        contactListAdapter = new ContactListAdapter(fActivity, contacts);
 
         // set adapter
-        this.contactList.setAdapter(this.contactListAdapter);
+        contactList.setAdapter(contactListAdapter);
 
-        btnRetrieveUsers = (Button) rLayout.findViewById(R.id.btn_retrieve_users);
-        txtUsersResponse = (TextView) rLayout.findViewById(R.id.txt_users_response);
-
-
-
-        btnRetrieveUsers.setOnClickListener(new View.OnClickListener() {
+        // get contacts from rest api
+        ContactProvider.getInstance().update(new ContactProvider.ContactActionListener() {
             @Override
-            public void onClick(View v) {
-                ContactProvider.getInstance().update(new ContactProvider.ContactActionListener() {
-                    @Override
-                    public void onUpdated(String s) {
-                        txtUsersResponse.setText(s);
-                    }
-                });
-                //txtUsersResponse.setText("Pretty please!");
+            public void onUpdated(String s) {
+                contacts = ContactProvider.getInstance().getContacts();
+
+                // update contact list view
+                ((ArrayAdapter<Object>) contactList.getAdapter()).notifyDataSetChanged();
             }
         });
 

@@ -6,27 +6,6 @@
     <ListView
         android:id ="@+id/contact_list"
         android:layout_width ="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/contact_retriever" />
-
-    <LinearLayout
-        android:id="@+id/contact_retriever"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/lbl_ok"
-            android:id="@+id/btn_retrieve_users" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/txt_users_response"
-            android:text="@string/empty_text" />
-
-    </LinearLayout>
+        android:layout_height="match_parent" />
 
 </RelativeLayout>

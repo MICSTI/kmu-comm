@@ -32,6 +32,9 @@ public class APIRetriever {
         HttpClient httpClient = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(url);
 
+        // set content type
+        httpGet.setHeader("Content-type", "application/json");
+
         boolean success = false;
         int tryCount = 0;
 
@@ -43,7 +46,7 @@ public class APIRetriever {
 
                 HttpEntity entity = response.getEntity();
 
-                BufferedReader inReader = new BufferedReader(new InputStreamReader(entity.getContent()));
+                BufferedReader inReader = new BufferedReader(new InputStreamReader(entity.getContent(), "UTF-8"), 8);
 
                 String line;
 

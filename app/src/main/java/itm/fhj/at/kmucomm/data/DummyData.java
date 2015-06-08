@@ -21,6 +21,7 @@ public class DummyData implements DataInterface {
 
         Contact flo = new Contact();
         flo.setId(1);
+        flo.setUsername("mayerhofer13");
         flo.setFirstName("Florian");
         flo.setLastName("Mayerhofer");
         flo.setDepartment("ITM");
@@ -28,18 +29,21 @@ public class DummyData implements DataInterface {
 
         Contact andi = new Contact();
         andi.setId(2);
+        andi.setUsername("hoeffernig13");
         andi.setFirstName("Andreas");
         andi.setLastName("Höffernig");
         andi.setDepartment("ITM");
 
         Contact kevin = new Contact();
         kevin.setId(3);
+        kevin.setUsername("pfeifer13");
         kevin.setFirstName("Kevin");
         kevin.setLastName("Pfeifer");
         kevin.setDepartment("ITM");
 
         Contact michi = new Contact();
         michi.setId(4);
+        michi.setUsername("stifter13");
         michi.setFirstName("Michael");
         michi.setLastName("Stifter");
         michi.setEmail("michael.stifter2@edu.fh-joanneum.at");

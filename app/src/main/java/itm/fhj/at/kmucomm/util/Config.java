@@ -14,5 +14,5 @@ public class Config {
     /**
      * Number of tries that the app tries to connect to the API
      */
-    public static final int NETWORK_TRIES = 5;
+    public static final int NETWORK_TRIES = 3;
 }

@@ -2,8 +2,14 @@ package itm.fhj.at.kmucomm.api;
 
 import android.os.AsyncTask;
 
-import java.util.ArrayList;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import itm.fhj.at.kmucomm.data.DummyDataAccessor;
 import itm.fhj.at.kmucomm.model.Contact;
 
 /**
@@ -15,10 +21,19 @@ public class ContactProvider {
 
     private APIRetriever retriever;
 
-    private String json;
+    private List<Contact> contacts;
+
+    // constants for JSON data exchange
+    public static final String CONTACT_USERNAME = "username";
+    public static final String CONTACT_EMAIL = "email";
+    public static final String CONTACT_FIRST_NAME = "firstName";
+    public static final String CONTACT_LAST_NAME = "lastName";
+    public static final String CONTACT_PASSWORD = "password";
+    public static final String CONTACT_PHONE = "telNr";
+    public static final String CONTACT_DEPARTMENT = "department";
 
     private ContactProvider() {
-        json = "{}";
+        contacts = DummyDataAccessor.getInstance().getContacts();
     }
 
     public static ContactProvider getInstance() {
@@ -37,7 +52,43 @@ public class ContactProvider {
     public String retrieve() {
         retriever = new APIRetriever();
 
-        return retriever.retrieveContacts();
+        String response = retriever.retrieveContacts();
+
+        // parse response and add contacts to the contact list
+        parseResponse(response);
+
+        return response;
+    }
+
+    private void parseResponse(String response) {
+        try {
+            JSONArray jsonArray = new JSONArray(response);
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                Contact contact = new Contact();
+
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                contact.setUsername(jsonObject.getString(CONTACT_USERNAME));
+                contact.setFirstName(jsonObject.getString(CONTACT_FIRST_NAME));
+                contact.setLastName(jsonObject.getString(CONTACT_LAST_NAME));
+                contact.setDepartment(jsonObject.getString(CONTACT_DEPARTMENT));
+                contact.setEmail(jsonObject.getString(CONTACT_EMAIL));
+                contact.setPassword(jsonObject.getString(CONTACT_PASSWORD));
+                contact.setPhone(jsonObject.getString(CONTACT_PHONE));
+
+                contacts.add(contact);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Contact> getContacts() {
+        return contacts;
     }
 
     class ContactHelperTask extends AsyncTask<String, String, String> {
