@@ -1,6 +1,9 @@
 package itm.fhj.at.kmucomm.fragment;
 
 import android.app.Activity;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -68,10 +71,10 @@ public class ContactListFragment extends Fragment {
         contacts = ContactProvider.getInstance().getContacts();
 
         // get list view
-        this.contactList = (ListView) rLayout.findViewById(R.id.contact_list);
+        contactList = (ListView) rLayout.findViewById(R.id.contact_list);
 
         // add onclick listener for item selection
-        this.contactList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        contactList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Contact selectedContact = (Contact) parent.getItemAtPosition(position);
@@ -86,16 +89,22 @@ public class ContactListFragment extends Fragment {
         // set adapter
         contactList.setAdapter(contactListAdapter);
 
-        // get contacts from rest api
-        ContactProvider.getInstance().update(new ContactProvider.ContactActionListener() {
-            @Override
-            public void onUpdated(String s) {
-                contacts = ContactProvider.getInstance().getContacts();
+        // don't try to update if there is no internet connection
+        ConnectivityManager cm = (ConnectivityManager) fActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
 
-                // update contact list view
-                ((ArrayAdapter<Object>) contactList.getAdapter()).notifyDataSetChanged();
-            }
-        });
+        if (networkInfo != null && networkInfo.isConnected()) {
+            // get contacts from rest api
+            ContactProvider.getInstance().update(new ContactProvider.ContactActionListener() {
+                @Override
+                public void onUpdated(String s) {
+                    contacts = ContactProvider.getInstance().getContacts();
+
+                    // update contact list view
+                    ((ArrayAdapter<Object>) contactList.getAdapter()).notifyDataSetChanged();
+                }
+            });
+        }
 
         // we must return the loaded layout
         return rLayout;
