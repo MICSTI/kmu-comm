@@ -18,9 +18,9 @@ public interface DataInterface {
 
     /**
      * Adds a contact
-     * @return boolean true/false if operation was successful
+     * @return integer id of the newly assigned id, or CommunicationDatabaseHelper.defaultId if unsuccessful
      */
-    public boolean addContact(Contact contact);
+    public int addContact(Contact contact);
 
     /**
      * Returns a list containing all chats
@@ -31,9 +31,9 @@ public interface DataInterface {
     /**
      * Adds a new chat.
      * @param chat
-     * @return boolean true/false if operation was successful
+     * @return integer id of the newly assigned id, or CommunicationDatabaseHelper.defaultId if unsuccessful
      */
-    public boolean addChat(Chat chat);
+    public int addChat(Chat chat);
 
     /**
      * Returns a list containing all messages for the passed chat object
@@ -46,7 +46,7 @@ public interface DataInterface {
      * Adds a new message to a chat.
      * @param chat
      * @param message
-     * @return boolean true/false if operation was successful
+     * @return integer id of the newly assigned id, or CommunicationDatabaseHelper.defaultId if unsuccessful
      */
-    public boolean addChatMessage(Chat chat, Message message);
+    public int addChatMessage(Chat chat, Message message);
 }

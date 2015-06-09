@@ -1,5 +1,6 @@
 package itm.fhj.at.kmucomm.activity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -12,6 +13,8 @@ import itm.fhj.at.kmucomm.model.Contact;
 
 
 public class ContactDetailActivity extends ActionBarActivity {
+
+    final Context context = this;
 
     private Contact contact;
 
@@ -54,7 +57,6 @@ public class ContactDetailActivity extends ActionBarActivity {
             contactEmail.setVisibility(View.GONE);
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

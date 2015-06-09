@@ -34,15 +34,15 @@ public class DummyDataAccessor {
         return data.getChatMessages(chat);
     }
 
-    public boolean addContact(Contact contact) {
+    public int addContact(Contact contact) {
         return data.addContact(contact);
     }
 
-    public boolean addChat(Chat chat) {
+    public int addChat(Chat chat) {
         return data.addChat(chat);
     }
 
-    public boolean addChatMessage(Chat chat, Message message) {
+    public int addChatMessage(Chat chat, Message message) {
         return data.addChatMessage(chat, message);
     }
 }

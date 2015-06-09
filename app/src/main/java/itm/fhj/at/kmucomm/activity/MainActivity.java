@@ -2,6 +2,8 @@ package itm.fhj.at.kmucomm.activity;
 
 import java.util.Locale;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -25,6 +27,7 @@ import itm.fhj.at.kmucomm.fragment.ChatListFragment;
 import itm.fhj.at.kmucomm.fragment.ContactListFragment;
 import itm.fhj.at.kmucomm.model.Chat;
 import itm.fhj.at.kmucomm.model.Contact;
+import itm.fhj.at.kmucomm.xmpp.ChatService;
 
 
 public class MainActivity extends ActionBarActivity implements
@@ -92,6 +95,14 @@ public class MainActivity extends ActionBarActivity implements
         // get instances of ChatListFragment and ContactListFragment
         chatListFragment = ChatListFragment.newInstance();
         contactListFragment = ContactListFragment.newInstance();
+
+        // try to log user in with the credentials provided in SettingsActivity (stored in SharedPreferences)
+        ChatService.getInstance(this).connect(new ChatService.XMPPActionListener() {
+            @Override
+            public void onUpdated(String msg) {
+                createAlert(msg);
+            }
+        });
     }
 
 
@@ -131,6 +142,11 @@ public class MainActivity extends ActionBarActivity implements
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+    }
+
+    @Override
+    public void onDestroy() {
+        ChatService.getInstance(this).closeConnection();
     }
 
     /**
@@ -245,5 +261,32 @@ public class MainActivity extends ActionBarActivity implements
     public void openSettings() {
         Intent settingsIntent = new Intent(this, SettingsActivity.class);
         startActivity(settingsIntent);
+    }
+
+    private void createAlert(String message) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        alertDialogBuilder.setTitle("Openfire Status Message");
+
+        alertDialogBuilder
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        alertDialog.show();
+
     }
 }

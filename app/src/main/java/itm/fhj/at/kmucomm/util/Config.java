@@ -15,4 +15,19 @@ public class Config {
      * Number of tries that the app tries to connect to the API
      */
     public static final int NETWORK_TRIES = 3;
+
+    /**
+     * XMPP configuration
+     */
+    public static final String OF_BOB_USERNAME = "bob";
+    public static final String OF_BOB_PASSWORD = "bob";
+    public static final String OF_BOB_EMAIL = "bob@projekt.at";
+
+    public static final String OF_ADMIN_USERNAME = "admin";
+    public static final String OF_ADMIN_PASSWORD = "openfire_distcomp_2015";
+    public static final String OF_ADMIN_EMAIL = "mayflc07@gmail.com";
+
+    public static final String OPENFIRE_HASH = "9f9d51bc70ef21ca5c14f307980a29d8";
+    public static final String OPENFIRE_SERVER = "10.76.1.147";
+    public static final int OPENFIRE_PORT = 5222;
 }

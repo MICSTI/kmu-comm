@@ -15,6 +15,9 @@ public class DummyData implements DataInterface {
     private List<Contact> contacts;
     private List<Chat> chats;
 
+    public static final int OPERATION_SUCCESS = 1;
+    public static final int OPERATION_FAILURE = 0;
+
     public DummyData() {
         // Contacts
         contacts = new ArrayList<Contact>();
@@ -117,22 +120,23 @@ public class DummyData implements DataInterface {
     }
 
     @Override
-    public boolean addContact(Contact contact) {
-        return contacts.add(contact);
+    public int addContact(Contact contact) {
+        return contacts.add(contact) ? OPERATION_SUCCESS : OPERATION_FAILURE;
     }
 
     @Override
-    public boolean addChat(Chat chat) {
-        return chats.add(chat);
+    public int addChat(Chat chat) {
+        return chats.add(chat) ? OPERATION_SUCCESS : OPERATION_FAILURE;
     }
 
     @Override
-    public boolean addChatMessage(Chat chat, Message message) {
+    public int addChatMessage(Chat chat, Message message) {
         List<Message> messageList = chat.getMessageList();
         messageList.add(message);
 
         //chat.setMessageList(messageList);
         chats.get(chats.indexOf(chat)).setMessageList(messageList);
-        return true;
+
+        return OPERATION_SUCCESS;
     }
 }
