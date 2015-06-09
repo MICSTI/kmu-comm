@@ -30,4 +30,9 @@
     <string name="lbl_phone">Phone</string>
     <string name="lbl_email">E-Mail</string>
 
+    <string name="lbl_connect">Trying to connect to Openfire server...</string>
+
+    <color name="white">#ffffff</color>
+    <color name="itm">#76b82a</color>
+
 </resources>

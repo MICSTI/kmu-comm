@@ -5,6 +5,8 @@ import java.util.Locale;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -18,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import itm.fhj.at.kmucomm.R;
 import itm.fhj.at.kmucomm.activity.ChatDetailActivity;
@@ -52,6 +55,12 @@ public class MainActivity extends ActionBarActivity implements
 
     ChatListFragment chatListFragment;
     ContactListFragment contactListFragment;
+
+    TextView statusTxt;
+
+    private SharedPreferences preferences;
+
+    private ChatService chatService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,8 +105,15 @@ public class MainActivity extends ActionBarActivity implements
         chatListFragment = ChatListFragment.newInstance();
         contactListFragment = ContactListFragment.newInstance();
 
-        // try to log user in with the credentials provided in SettingsActivity (stored in SharedPreferences)
-        ChatService.getInstance(this).connect(new ChatService.XMPPActionListener() {
+        // get shared preferences
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // status bar at the bottom
+        statusTxt = (TextView) findViewById(R.id.status_bar);
+
+        // set up chat service and try to log user in with the credentials provided in SettingsActivity (stored in SharedPreferences)
+        chatService = ChatService.getInstance(preferences.getString("username", ""), preferences.getString("password", ""));
+        chatService.connect(new ChatService.XMPPActionListener() {
             @Override
             public void onUpdated(String msg) {
                 createAlert(msg);
@@ -146,7 +162,7 @@ public class MainActivity extends ActionBarActivity implements
 
     @Override
     public void onDestroy() {
-        ChatService.getInstance(this).closeConnection();
+        chatService.closeConnection();
     }
 
     /**

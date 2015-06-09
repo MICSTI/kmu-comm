@@ -3,6 +3,8 @@ package itm.fhj.at.kmucomm.xmpp;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -32,31 +34,36 @@ public class ChatService {
 
     private static ChatService instance;
 
-    public static ChatService getInstance(Context context) {
+    public static ChatService getInstance(String username, String password) {
+        AUTH_USERNAME = username;
+        AUTH_PASSWORD = password;
+
+        return getInstance();
+    }
+
+    public static ChatService getInstance() {
         if (instance == null) {
-            instance = new ChatService(context);
+            instance = new ChatService();
         }
 
         return instance;
     }
 
-    public ChatService(Context context) {
-        this.context = context;
-        this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
-    }
+    public ChatService() {
 
-    private Context context;
+    }
 
     private AbstractXMPPConnection connection;
 
-    private SharedPreferences preferences;
+    private static String AUTH_USERNAME = "";
+    private static String AUTH_PASSWORD = "";
 
     private String createConnection() {
         // Create XMPP connection
         System.setProperty("java.net.preferIPv6Addresses", "false");
 
         XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
-                .setUsernameAndPassword(preferences.getString("username", ""), preferences.getString("password", ""))
+                .setUsernameAndPassword(AUTH_USERNAME, AUTH_PASSWORD)
                 .setHost(Config.OPENFIRE_SERVER)
                 .setServiceName(Config.OPENFIRE_SERVER)
                 .setPort(Config.OPENFIRE_PORT)
@@ -100,7 +107,7 @@ public class ChatService {
             //connection.disconnect();
         } catch (XMPPException e) {
             Log.e(TAG, e.toString());
-            return "User not logged in";
+           return "User not logged in";
         } catch (SmackException e) {
             Log.e(TAG, e.toString());
             return "User not logged in";
@@ -147,6 +154,10 @@ public class ChatService {
     }
 
     public interface XMPPActionListener {
+        void onUpdated(String msg);
+    }
+
+    public interface StatusActionListener {
         void onUpdated(String msg);
     }
 
