@@ -1,5 +1,9 @@
 package itm.fhj.at.kmucomm.util;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+
 /**
  * Created by michael.stifter on 27.05.2015.
  */

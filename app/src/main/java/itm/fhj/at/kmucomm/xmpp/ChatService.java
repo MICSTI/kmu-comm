@@ -12,6 +12,7 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.chat.ChatManagerListener;
 import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
@@ -20,6 +21,7 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import java.io.IOException;
 
 import itm.fhj.at.kmucomm.util.Config;
+import itm.fhj.at.kmucomm.util.Util;
 
 /**
  * Created by michael.stifter on 09.06.2015.
@@ -64,9 +66,22 @@ public class ChatService {
         connection = new XMPPTCPConnection(config);
 
         try {
-            connection.connect();
+            connection.connect().login();
 
-            connection.login();
+            // Register listeners for chats and messages
+            ChatManager chatManager = ChatManager.getInstanceFor(connection);
+
+            chatManager.addChatListener(new ChatManagerListener() {
+                @Override
+                public void chatCreated(Chat chat, boolean createdLocally) {
+                    chat.addMessageListener(new ChatMessageListener() {
+                        @Override
+                        public void processMessage(Chat chat, Message message) {
+
+                        }
+                    });
+                }
+            });
 
             /*
             //ChatManager chatManager = ChatManager.getInstanceFor(connection);
@@ -133,6 +148,18 @@ public class ChatService {
 
     public interface XMPPActionListener {
         void onUpdated(String msg);
+    }
+
+    private class ChatManagerListenerImpl implements ChatManagerListener {
+        @Override
+        public void chatCreated(Chat chat, boolean createdLocally) {
+            chat.addMessageListener(new ChatMessageListener() {
+                @Override
+                public void processMessage(Chat chat, Message message) {
+
+                }
+            });
+        }
     }
 
 }
