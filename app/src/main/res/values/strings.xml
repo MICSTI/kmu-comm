@@ -19,6 +19,7 @@
     <string name="title_activity_contact_detail">Contact Detail</string>
     <string name="title_activity_chat_detail">ChatDetailActivity</string>
 
+    <string name="lbl_null"></string>
     <string name="lbl_ok">Ok</string>
     <string name="lbl_username">User name</string>
     <string name="lbl_password">Password</string>

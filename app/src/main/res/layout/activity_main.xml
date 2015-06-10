@@ -14,7 +14,7 @@
         android:id="@+id/status_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/lbl_connect"
+        android:text="@string/lbl_null"
         android:layout_alignParentBottom="true"
         android:gravity="center"
         android:clickable="false"

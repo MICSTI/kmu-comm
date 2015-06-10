@@ -112,11 +112,11 @@ public class MainActivity extends ActionBarActivity implements
         statusTxt = (TextView) findViewById(R.id.status_bar);
 
         // set up chat service and try to log user in with the credentials provided in SettingsActivity (stored in SharedPreferences)
-        chatService = ChatService.getInstance(preferences.getString("username", ""), preferences.getString("password", ""));
+        chatService = ChatService.getInstance(this, preferences.getString("username", ""), preferences.getString("password", ""));
         chatService.connect(new ChatService.XMPPActionListener() {
             @Override
             public void onUpdated(String msg) {
-                createAlert(msg);
+                //createAlert(msg);
             }
         });
     }
@@ -304,5 +304,9 @@ public class MainActivity extends ActionBarActivity implements
 
         alertDialog.show();
 
+    }
+
+    public void setStatusText(String text) {
+        statusTxt.setText(text);
     }
 }

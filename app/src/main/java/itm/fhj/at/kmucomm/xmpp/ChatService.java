@@ -22,6 +22,7 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
 import java.io.IOException;
 
+import itm.fhj.at.kmucomm.activity.MainActivity;
 import itm.fhj.at.kmucomm.util.Config;
 import itm.fhj.at.kmucomm.util.Util;
 
@@ -30,11 +31,19 @@ import itm.fhj.at.kmucomm.util.Util;
  */
 public class ChatService {
 
-    private static final String TAG = ChatService.class.getName();
+    public static final String TAG = ChatService.class.getName();
+
+    public static final String MSG_SUCCESS = "Success";
+    public static final String MSG_CONNECTING = "Trying to connect to Openfire server";
+    public static final String MSG_USER_LOGGED_IN = "User successfully logged in as ";
+    public static final String MSG_USER_NOT_LOGGED_IN = "User not logged in";
 
     private static ChatService instance;
 
-    public static ChatService getInstance(String username, String password) {
+    private static MainActivity mActivity;
+
+    public static ChatService getInstance(MainActivity mainActivity, String username, String password) {
+        mActivity = mainActivity;
         AUTH_USERNAME = username;
         AUTH_PASSWORD = password;
 
@@ -59,6 +68,8 @@ public class ChatService {
     private static String AUTH_PASSWORD = "";
 
     private String createConnection() {
+        setStatusText(MSG_CONNECTING);
+
         // Create XMPP connection
         System.setProperty("java.net.preferIPv6Addresses", "false");
 
@@ -74,6 +85,9 @@ public class ChatService {
 
         try {
             connection.connect().login();
+
+            // send new status message
+            setStatusText(MSG_USER_LOGGED_IN + AUTH_USERNAME);
 
             // Register listeners for chats and messages
             ChatManager chatManager = ChatManager.getInstanceFor(connection);
@@ -107,19 +121,23 @@ public class ChatService {
             //connection.disconnect();
         } catch (XMPPException e) {
             Log.e(TAG, e.toString());
-           return "User not logged in";
+            setStatusText(MSG_USER_NOT_LOGGED_IN);
+            return MSG_USER_NOT_LOGGED_IN;
         } catch (SmackException e) {
             Log.e(TAG, e.toString());
-            return "User not logged in";
+            setStatusText(MSG_USER_NOT_LOGGED_IN);
+            return MSG_USER_NOT_LOGGED_IN;
         } catch (IOException e) {
             Log.e(TAG, e.toString());
-            return "User not logged in";
+            setStatusText(MSG_USER_NOT_LOGGED_IN);
+            return MSG_USER_NOT_LOGGED_IN;
         } catch (Exception e) {
             Log.e(TAG, e.toString());
-            return "User not logged in";
+            setStatusText(MSG_USER_NOT_LOGGED_IN);
+            return MSG_USER_NOT_LOGGED_IN;
         }
 
-        return "User logged in";
+        return MSG_SUCCESS;
     }
 
     public void connect(XMPPActionListener listener) {
@@ -171,6 +189,15 @@ public class ChatService {
                 }
             });
         }
+    }
+
+    private void setStatusText(final String text) {
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mActivity.setStatusText(text);
+            }
+        });
     }
 
 }
