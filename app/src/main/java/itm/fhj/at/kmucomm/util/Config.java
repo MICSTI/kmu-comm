@@ -30,4 +30,6 @@ public class Config {
     public static final String OPENFIRE_HASH = "9f9d51bc70ef21ca5c14f307980a29d8";
     public static final String OPENFIRE_SERVER = "10.76.1.147";
     public static final int OPENFIRE_PORT = 5222;
+
+    public static final char CHAR_NEW_LINE = '\n';
 }

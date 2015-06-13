@@ -30,6 +30,7 @@ import itm.fhj.at.kmucomm.fragment.ChatListFragment;
 import itm.fhj.at.kmucomm.fragment.ContactListFragment;
 import itm.fhj.at.kmucomm.model.Chat;
 import itm.fhj.at.kmucomm.model.Contact;
+import itm.fhj.at.kmucomm.util.Config;
 import itm.fhj.at.kmucomm.xmpp.ChatService;
 
 
@@ -56,7 +57,9 @@ public class MainActivity extends ActionBarActivity implements
     ChatListFragment chatListFragment;
     ContactListFragment contactListFragment;
 
-    TextView statusTxt;
+    public static boolean STATUS_APPEND = true;
+    private StringBuilder statusBuilder;
+    private TextView statusTxt;
 
     private SharedPreferences preferences;
 
@@ -110,6 +113,9 @@ public class MainActivity extends ActionBarActivity implements
 
         // status bar at the bottom
         statusTxt = (TextView) findViewById(R.id.status_bar);
+
+        // status string builder
+        statusBuilder = new StringBuilder();
 
         // set up chat service and try to log user in with the credentials provided in SettingsActivity (stored in SharedPreferences)
         chatService = ChatService.getInstance(this, preferences.getString("username", ""), preferences.getString("password", ""));
@@ -307,6 +313,15 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     public void setStatusText(String text) {
-        statusTxt.setText(text);
+        if (STATUS_APPEND) {
+            if (statusBuilder.length() > 0)
+                statusBuilder.append(Config.CHAR_NEW_LINE);
+
+            statusBuilder.append(text);
+
+            statusTxt.setText(statusBuilder.toString());
+        } else {
+            statusTxt.setText(text);
+        }
     }
 }
