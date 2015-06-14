@@ -84,6 +84,16 @@ public class Chat implements Serializable {
         return 0;
     }
 
+    public Message getLastMessage() {
+        if (messageList.size() > 0) {
+            Message lastMessage = messageList.get(messageList.size() - 1);
+
+            return lastMessage;
+        }
+
+        return null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

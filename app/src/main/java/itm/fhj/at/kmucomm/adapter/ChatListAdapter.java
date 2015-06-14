@@ -1,6 +1,7 @@
 package itm.fhj.at.kmucomm.adapter;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +41,14 @@ public class ChatListAdapter extends ArrayAdapter<Chat> {
 
         // add the values to the views
         chatName.setText(Util.getCamelCase(chat.getResource()));
-        chatLastMessageText.setText(Util.getCamelCase(chat.getLastMessageText()));
+
+        // if last message was sent by yourself, show "You" instead of username
+        if (chat.getLastMessage().getFrom().equals(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("username", ""))) {
+            chatLastMessageText.setText("You: " + chat.getLastMessage().getText());
+        } else {
+            chatLastMessageText.setText(Util.getCamelCase(chat.getLastMessageText()));
+        }
+
         chatLastMessageTimestamp.setText(Util.getTime(chat.getLastMessageTimestamp()));
 
         // return the completed view to render on screen
