@@ -22,7 +22,38 @@ public class SQLiteData implements DataInterface {
     private static CommunicationDatabaseHelper cdh;
 
     public static void init(Context context) {
-        cdh = new CommunicationDatabaseHelper(context);
+        cdh = CommunicationDatabaseHelper.getHelper(context);
+    }
+
+    public SQLiteData(Context context) {
+        init(context);
+    }
+
+    public int incomingChat(String resource, List<String> participantList) {
+        int chatId = cdh.defaultId;
+
+        Chat chat = new Chat(resource);
+        chat.setParticipantList(participantList);
+
+        chatId = cdh.chatExists(chat);
+
+        if (chatId == cdh.defaultId) {
+            // add chat to local database
+            chatId = addChat(chat);
+        }
+
+        return chatId;
+    }
+
+    public void incomingMessage(int chatId, String from, String text) {
+        Message message = new Message();
+
+        message.setTimestamp(Util.getTimestamp());
+        message.setChatId(chatId);
+        message.setFrom(from);
+        message.setText(text);
+
+        addMessage(message);
     }
 
     @Override
@@ -47,12 +78,21 @@ public class SQLiteData implements DataInterface {
 
     @Override
     public List<Message> getChatMessages(Chat chat) {
-        return cdh.getChatMessages(chat);
+        // TODO: Remove and delete from interface!
+        return null;
+    }
+
+    public List<Message> getChatMessages(int chatId) {
+        return cdh.getChatMessages(chatId);
     }
 
     @Override
     public int addChatMessage(Chat chat, Message message) {
         return cdh.addChatMessage(chat, message);
+    }
+
+    public int addMessage(Message message) {
+        return cdh.addMessage(message);
     }
 
     public void addDummyRecords() {
@@ -67,5 +107,9 @@ public class SQLiteData implements DataInterface {
         for (Chat c : dda.getChats()) {
             addChat(c);
         }
+    }
+
+    public List<Message> getAllMessages() {
+        return cdh.getAllMessages();
     }
 }

@@ -37,7 +37,7 @@ public class MessageListAdapter extends ArrayAdapter<Message> {
         TextView messageTime = (TextView) convertView.findViewById(R.id.messageTime);
 
         // add the values to the views
-        messageContactName.setText(message.getSender().getName());
+        messageContactName.setText(Util.getCamelCase(message.getFrom()));
         messageText.setText(message.getText());
         messageTime.setText(Util.getTime(message.getTimestamp()));
 

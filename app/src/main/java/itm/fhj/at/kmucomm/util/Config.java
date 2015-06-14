@@ -1,9 +1,12 @@
 package itm.fhj.at.kmucomm.util;
 
+import java.text.SimpleDateFormat;
+
 /**
  * Created by michael.stifter on 07.06.2015.
  */
 public class Config {
+
     /**
      * API addresses
      */
@@ -15,6 +18,8 @@ public class Config {
      * Number of tries that the app tries to connect to the API
      */
     public static final int NETWORK_TRIES = 3;
+
+    public static final SimpleDateFormat FORMAT_DATE_TIME = new SimpleDateFormat("dd.mm.YYYY HH:mm");
 
     /**
      * XMPP configuration
@@ -31,5 +36,8 @@ public class Config {
     public static final String OPENFIRE_SERVER = "10.76.1.147";
     public static final int OPENFIRE_PORT = 5222;
 
+    public static final String OPENFIRE_RESOURCE = "@projmgmt";
+
     public static final char CHAR_NEW_LINE = '\n';
+    public static final char CHAR_AT = '@';
 }

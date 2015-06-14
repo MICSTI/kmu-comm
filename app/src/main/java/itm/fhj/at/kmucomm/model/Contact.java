@@ -9,7 +9,6 @@ public class Contact implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private int id;
     private String firstName;
     private String lastName;
     private String username;
@@ -33,14 +32,6 @@ public class Contact implements Serializable {
     @Override
     public String toString() {
         return getFirstName() + " " + getLastName();
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getFirstName() {
@@ -106,7 +97,6 @@ public class Contact implements Serializable {
 
         Contact contact = (Contact) o;
 
-        if (id != contact.id) return false;
         if (username != contact.username) return false;
 
         return true;
@@ -114,6 +104,6 @@ public class Contact implements Serializable {
 
     @Override
     public int hashCode() {
-        return id;
+        return username.hashCode();
     }
 }

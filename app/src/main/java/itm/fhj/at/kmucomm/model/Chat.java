@@ -1,6 +1,7 @@
 package itm.fhj.at.kmucomm.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,8 +12,20 @@ public class Chat implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private int id;
-    private String name;
+    private String resource;
+    private List<String> participantList;
     private List<Message> messageList;
+
+    public Chat() {
+        participantList = new ArrayList<String>();
+        messageList = new ArrayList<Message>();
+    }
+
+    public Chat(String resource) {
+        setResource(resource);
+        participantList = new ArrayList<String>();
+        messageList = new ArrayList<Message>();
+    }
 
     public int getId() {
         return id;
@@ -22,12 +35,12 @@ public class Chat implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getResource() {
+        return resource;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setResource(String resource) {
+        this.resource = resource;
     }
 
     public List<Message> getMessageList() {
@@ -38,21 +51,37 @@ public class Chat implements Serializable {
         this.messageList = messageList;
     }
 
+    public List<String> getParticipantList() {
+        return participantList;
+    }
+
+    public void setParticipantList(List<String> participantList) {
+        this.participantList = participantList;
+    }
+
     /**
      * Returns the message text of the last message in the chat.
      * E.g. for displaying the last message on the chat activity
      */
     public String getLastMessageText() {
-        Message lastMessage = messageList.get(messageList.size() - 1);
+        if (messageList.size() > 0) {
+            Message lastMessage = messageList.get(messageList.size() - 1);
 
-        return lastMessage.getSender().getName() + ": " + lastMessage.getText();
+            return lastMessage.getFrom() + ": " + lastMessage.getText();
+        }
+
+        return "no message";
     }
 
     /**
      * Returns the timestamp of the last sent message in the chat.
      */
     public long getLastMessageTimestamp() {
-        return messageList.get(messageList.size() - 1).getTimestamp();
+        if (messageList.size() > 0) {
+            return messageList.get(messageList.size() - 1).getTimestamp();
+        }
+
+        return 0;
     }
 
     @Override
@@ -63,7 +92,6 @@ public class Chat implements Serializable {
         Chat chat = (Chat) o;
 
         if (id != chat.id) return false;
-        if (!name.equals(chat.name)) return false;
 
         return true;
     }

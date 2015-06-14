@@ -14,13 +14,19 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import itm.fhj.at.kmucomm.R;
 import itm.fhj.at.kmucomm.adapter.ChatListAdapter;
 import itm.fhj.at.kmucomm.data.DummyDataAccessor;
+import itm.fhj.at.kmucomm.data.SQLiteData;
 import itm.fhj.at.kmucomm.model.Chat;
+import itm.fhj.at.kmucomm.model.Message;
+import itm.fhj.at.kmucomm.util.CommunicationDatabaseHelper;
+import itm.fhj.at.kmucomm.xmpp.ChatService;
 
 
 public class ChatListFragment extends Fragment {
@@ -32,6 +38,8 @@ public class ChatListFragment extends Fragment {
     private OnChatSelectedListener mCallback;
 
     private ListView chatListView;
+
+    private List<Chat> chatList;
 
     private ChatListAdapter chatListAdapter;
 
@@ -60,8 +68,6 @@ public class ChatListFragment extends Fragment {
 
         rLayout = (RelativeLayout) inflater.inflate(R.layout.fragment_chat_list, container, false);
 
-        List<Chat> chatList = DummyDataAccessor.getInstance().getChats();
-
         // get list view
         chatListView = (ListView) rLayout.findViewById(R.id.chat_list);
 
@@ -75,8 +81,10 @@ public class ChatListFragment extends Fragment {
             }
         });
 
+        //chatList = CommunicationDatabaseHelper.getHelper(fActivity.getApplicationContext()).getChats();
+
         // create adapter
-        chatListAdapter = new ChatListAdapter(fActivity, chatList);
+        chatListAdapter = new ChatListAdapter(fActivity, CommunicationDatabaseHelper.getHelper(fActivity.getApplicationContext()).getChats());
 
         // set adapter
         chatListView.setAdapter(chatListAdapter);
@@ -110,8 +118,12 @@ public class ChatListFragment extends Fragment {
     }*/
 
     public void updateFragment() {
-        // update list view in case new messages have been entered in the child (ChatDetailActivity)
-        ((ArrayAdapter<Object>) chatListView.getAdapter()).notifyDataSetChanged();
+        // clear adapter and set it up again
+        ((ArrayAdapter<Object>) chatListView.getAdapter()).clear();
+        chatListAdapter = new ChatListAdapter(fActivity, CommunicationDatabaseHelper.getHelper(fActivity.getApplicationContext()).getChats());
+
+        // set adapter
+        chatListView.setAdapter(chatListAdapter);
     }
 
     @Override

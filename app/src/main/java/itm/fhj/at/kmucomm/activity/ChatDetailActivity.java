@@ -1,6 +1,7 @@
 package itm.fhj.at.kmucomm.activity;
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,13 +12,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import java.util.List;
+
 import itm.fhj.at.kmucomm.R;
 import itm.fhj.at.kmucomm.adapter.MessageListAdapter;
 import itm.fhj.at.kmucomm.data.DummyDataAccessor;
 import itm.fhj.at.kmucomm.model.Chat;
 import itm.fhj.at.kmucomm.model.Contact;
 import itm.fhj.at.kmucomm.model.Message;
+import itm.fhj.at.kmucomm.util.Config;
 import itm.fhj.at.kmucomm.util.Util;
+import itm.fhj.at.kmucomm.xmpp.ChatService;
 
 public class ChatDetailActivity extends ActionBarActivity {
 
@@ -28,6 +33,8 @@ public class ChatDetailActivity extends ActionBarActivity {
     private EditText messageText;
 
     private MessageListAdapter messageListAdapter;
+
+    private List<Message> messageList;
 
     public static final int REQUEST_CODE_CHAT_DETAIL = 100;
 
@@ -51,10 +58,13 @@ public class ChatDetailActivity extends ActionBarActivity {
         chat = (Chat) getIntent().getSerializableExtra(EXTRA_MESSAGE);
 
         // set activity title to chat name
-        setTitle(chat.getName());
+        setTitle(Util.getCamelCase(chat.getResource()));
+
+        // message list
+        messageList = chat.getMessageList();
 
         // create adapter
-        messageListAdapter = new MessageListAdapter(this, chat.getMessageList());
+        messageListAdapter = new MessageListAdapter(this, messageList);
 
         // set adapter
         messageListView.setAdapter(messageListAdapter);
@@ -65,19 +75,25 @@ public class ChatDetailActivity extends ActionBarActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Message message = new Message();
+                Message newMessage = new Message();
 
-                Contact contact = DummyDataAccessor.getInstance().getContacts().get(3);
+                newMessage.setChatId(chat.getId());
+                newMessage.setText(messageText.getText().toString());
+                newMessage.setFrom(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("username", ""));
+                newMessage.setTimestamp(Util.getTimestamp());
 
-                message.setSender(contact);
-                message.setText(messageText.getText().toString());
-                message.setTimestamp(Util.getTimestamp());
-                message.setId(99);
+                // send message via xmpp
+                ChatService chatService = ChatService.getInstance();
+                chatService.sendMessage(chat.getParticipantList().get(0), newMessage.getText());
 
-                DummyDataAccessor.getInstance().addChatMessage(chat, message);
+                // add message to local database
+                chatService.getDb().addMessage(newMessage);
 
                 // clear text view for future input
                 messageText.setText("");
+
+                // update message list
+                messageList.add(newMessage);
 
                 // update list view
                 ((ArrayAdapter<Object>) messageListView.getAdapter()).notifyDataSetChanged();

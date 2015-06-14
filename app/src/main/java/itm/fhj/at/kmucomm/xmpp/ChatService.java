@@ -21,8 +21,11 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
+import itm.fhj.at.kmucomm.activity.ChatDetailActivity;
 import itm.fhj.at.kmucomm.activity.MainActivity;
+import itm.fhj.at.kmucomm.data.SQLiteData;
 import itm.fhj.at.kmucomm.util.Config;
 import itm.fhj.at.kmucomm.util.Util;
 
@@ -42,10 +45,16 @@ public class ChatService {
 
     private static MainActivity mActivity;
 
+    private static SQLiteData db;
+
+    private static ChatManager chatManager;
+
     public static ChatService getInstance(MainActivity mainActivity, String username, String password) {
         mActivity = mainActivity;
         AUTH_USERNAME = username;
         AUTH_PASSWORD = password;
+
+        db = mActivity.getDb();
 
         return getInstance();
     }
@@ -90,54 +99,63 @@ public class ChatService {
             setStatusText(MSG_USER_LOGGED_IN + AUTH_USERNAME);
 
             // Register listeners for chats and messages
-            ChatManager chatManager = ChatManager.getInstanceFor(connection);
+            chatManager = ChatManager.getInstanceFor(connection);
 
             chatManager.addChatListener(new ChatManagerListener() {
                 @Override
                 public void chatCreated(Chat chat, boolean createdLocally) {
+                    final String resource = Util.getUsernameFromResource(chat.getParticipant());
+
+                    ArrayList<String> participantList = new ArrayList<String>();
+                    participantList.add(resource);
+
+                    final int chatId = db.incomingChat(resource, participantList);
+
                     chat.addMessageListener(new ChatMessageListener() {
                         @Override
                         public void processMessage(Chat chat, Message message) {
+                            if (message.getBody() != null) {
+                                db.incomingMessage(chatId, Util.getUsernameFromResource(message.getFrom()), message.getBody());
 
+                                updateChatList();
+                            }
                         }
                     });
                 }
             });
-
-            /*
-            //ChatManager chatManager = ChatManager.getInstanceFor(connection);
-            Chat chat = ChatManager.getInstanceFor(connection).createChat(Config.OF_BOB_USERNAME, new ChatMessageListener() {
-                @Override
-                public void processMessage(Chat chat, Message message) {
-
-                }
-            });
-
-            chat.sendMessage("Openfire Message #2");*/
-
-
-            //Chat newChat = chatManager.createChat("", new )
-
-            //connection.disconnect();
         } catch (XMPPException e) {
             Log.e(TAG, e.toString());
-            setStatusText(MSG_USER_NOT_LOGGED_IN);
+            setStatusText(e.toString());
+            //setStatusText(MSG_USER_NOT_LOGGED_IN);
             return MSG_USER_NOT_LOGGED_IN;
         } catch (SmackException e) {
             Log.e(TAG, e.toString());
-            setStatusText(MSG_USER_NOT_LOGGED_IN);
+            setStatusText(e.toString());
+            //setStatusText(MSG_USER_NOT_LOGGED_IN);
             return MSG_USER_NOT_LOGGED_IN;
         } catch (IOException e) {
             Log.e(TAG, e.toString());
-            setStatusText(MSG_USER_NOT_LOGGED_IN);
+            setStatusText(e.toString());
+            //setStatusText(MSG_USER_NOT_LOGGED_IN);
             return MSG_USER_NOT_LOGGED_IN;
         } catch (Exception e) {
             Log.e(TAG, e.toString());
-            setStatusText(MSG_USER_NOT_LOGGED_IN);
+            setStatusText(e.toString());
+            //setStatusText(MSG_USER_NOT_LOGGED_IN);
             return MSG_USER_NOT_LOGGED_IN;
         }
 
         return MSG_SUCCESS;
+    }
+
+    public void sendMessage(String to, String text) {
+        try {
+            chatManager.createChat(to + Config.OPENFIRE_RESOURCE).sendMessage(text);
+        } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        }
+        //Chat bobChat = chatManager.createChat("bob2@projmgmt");
+        //bobChat.sendMessage("Sent from app");
     }
 
     public void connect(XMPPActionListener listener) {
@@ -198,6 +216,19 @@ public class ChatService {
                 mActivity.setStatusText(text);
             }
         });
+    }
+
+    private void updateChatList() {
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mActivity.updateChatList();
+            }
+        });
+    }
+
+    public SQLiteData getDb() {
+        return db;
     }
 
 }

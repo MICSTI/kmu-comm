@@ -1,5 +1,6 @@
 package itm.fhj.at.kmucomm.activity;
 
+import java.util.List;
 import java.util.Locale;
 
 import android.app.AlertDialog;
@@ -15,6 +16,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,15 +24,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.jivesoftware.smack.util.StringUtils;
+
 import itm.fhj.at.kmucomm.R;
 import itm.fhj.at.kmucomm.activity.ChatDetailActivity;
 import itm.fhj.at.kmucomm.activity.ContactDetailActivity;
 import itm.fhj.at.kmucomm.activity.SettingsActivity;
+import itm.fhj.at.kmucomm.data.SQLiteData;
 import itm.fhj.at.kmucomm.fragment.ChatListFragment;
 import itm.fhj.at.kmucomm.fragment.ContactListFragment;
 import itm.fhj.at.kmucomm.model.Chat;
 import itm.fhj.at.kmucomm.model.Contact;
+import itm.fhj.at.kmucomm.model.Message;
 import itm.fhj.at.kmucomm.util.Config;
+import itm.fhj.at.kmucomm.util.Util;
 import itm.fhj.at.kmucomm.xmpp.ChatService;
 
 
@@ -64,6 +71,8 @@ public class MainActivity extends ActionBarActivity implements
     private SharedPreferences preferences;
 
     private ChatService chatService;
+
+    private SQLiteData db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,12 +113,11 @@ public class MainActivity extends ActionBarActivity implements
                             .setTabListener(this));
         }
 
-        // get instances of ChatListFragment and ContactListFragment
-        chatListFragment = ChatListFragment.newInstance();
-        contactListFragment = ContactListFragment.newInstance();
-
         // get shared preferences
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // database
+        db = new SQLiteData(this);
 
         // status bar at the bottom
         statusTxt = (TextView) findViewById(R.id.status_bar);
@@ -125,6 +133,10 @@ public class MainActivity extends ActionBarActivity implements
                 //createAlert(msg);
             }
         });
+
+        // get instances of ChatListFragment and ContactListFragment
+        chatListFragment = ChatListFragment.newInstance();
+        contactListFragment = ContactListFragment.newInstance();
     }
 
 
@@ -323,5 +335,13 @@ public class MainActivity extends ActionBarActivity implements
         } else {
             statusTxt.setText(text);
         }
+    }
+
+    public void updateChatList() {
+        chatListFragment.updateFragment();
+    }
+
+    public SQLiteData getDb() {
+        return db;
     }
 }

@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import itm.fhj.at.kmucomm.data.DummyDataAccessor;
 import itm.fhj.at.kmucomm.model.Chat;
 import itm.fhj.at.kmucomm.model.Contact;
 import itm.fhj.at.kmucomm.model.Message;
@@ -19,9 +18,9 @@ import itm.fhj.at.kmucomm.model.Message;
  */
 public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 10;
 
-    public static final String DATABASE_NAME = "comm4kmu.db";
+    public static final String DATABASE_NAME = "comm4kmu";
 
     public static final String CONTACT_TABLE_NAME = "contacts";
     public static final String CHAT_TABLE_NAME = "chats";
@@ -29,7 +28,6 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
     public static final String CHAT_PARTICIPANTS_TABLE_NAME = "chat_participants";
 
     // Contacts table
-    public static final String CONTACT_KEY_ID = "_id";
     public static final String CONTACT_KEY_USERNAME = "username";
     public static final String CONTACT_KEY_FIRST_NAME = "first_name";
     public static final String CONTACT_KEY_LAST_NAME = "last_name";
@@ -39,9 +37,8 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
     public static final String CONTACT_KEY_EMAIL = "email";
 
     private static final String CONTACT_TABLE_CREATE =
-            "CREATE TABLE " + CONTACT_TABLE_NAME + " (" +
-                    CONTACT_KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    CONTACT_KEY_USERNAME + " TEXT, " +
+            "CREATE TABLE IF NOT EXISTS " + CONTACT_TABLE_NAME + " (" +
+                    CONTACT_KEY_USERNAME + " TEXT PRIMARY KEY, " +
                     CONTACT_KEY_FIRST_NAME + " TEXT, " +
                     CONTACT_KEY_LAST_NAME + " TEXT, " +
                     CONTACT_KEY_PASSWORD + " TEXT, " +
@@ -52,45 +49,52 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
 
     // Chats table
     public static final String CHAT_KEY_ID = "_id";
-    public static final String CHAT_KEY_NAME = "name";
+    public static final String CHAT_KEY_RESOURCE = "resource";
 
     private static final String CHAT_TABLE_CREATE =
-            "CREATE TABLE " + CONTACT_TABLE_NAME + " (" +
+            "CREATE TABLE IF NOT EXISTS " + CHAT_TABLE_NAME + " (" +
                     CHAT_KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    CHAT_KEY_NAME + " TEXT" +
+                    CHAT_KEY_RESOURCE + " TEXT" +
                     ");";
 
     // Chat participants table
     public static final String CHAT_PARTICIPANTS_KEY_ID = "_id";
     public static final String CHAT_PARTICIPANTS_FOREIGN_KEY_CHAT_ID = "fk_chat_id";
-    public static final String CHAT_PARTICIPANTS_FOREIGN_KEY_CONTACT_ID = "fk_contact_id";
+    public static final String CHAT_PARTICIPANTS_FOREIGN_KEY_CONTACT_USERNAME = "fk_contact_username";
 
     private static final String CHAT_PARTICIPANTS_CREATE =
-            "CREATE TABLE " + CHAT_PARTICIPANTS_TABLE_NAME + " (" +
+            "CREATE TABLE IF NOT EXISTS " + CHAT_PARTICIPANTS_TABLE_NAME + " (" +
                     CHAT_PARTICIPANTS_KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     CHAT_PARTICIPANTS_FOREIGN_KEY_CHAT_ID + " INTEGER, " +
-                    CHAT_PARTICIPANTS_FOREIGN_KEY_CONTACT_ID + " INTEGER" +
+                    CHAT_PARTICIPANTS_FOREIGN_KEY_CONTACT_USERNAME + " TEXT" +
                     ");";
 
     // Messages table
-    public static final String MESSAGES_KEY_ID = "_id";
-    public static final String MESSAGES_FOREIGN_KEY_CONTACT_ID = "fk_contact_id";
     public static final String MESSAGES_FOREIGN_KEY_CHAT_ID = "fk_chat_id";
+    public static final String MESSAGES_FOREIGN_KEY_USERNAME = "fk_username";
     public static final String MESSAGES_KEY_TEXT = "text";
     public static final String MESSAGES_KEY_TIMESTAMP = "timestamp";
 
     private static final String MESSAGES_CREATE =
-            "CREATE TABLE " + MESSAGE_TABLE_NAME + " (" +
-                    MESSAGES_KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    MESSAGES_FOREIGN_KEY_CONTACT_ID + " INTEGER, " +
+            "CREATE TABLE IF NOT EXISTS " + MESSAGE_TABLE_NAME + " (" +
                     MESSAGES_FOREIGN_KEY_CHAT_ID + " INTEGER, " +
+                    MESSAGES_FOREIGN_KEY_USERNAME + " TEXT, " +
                     MESSAGES_KEY_TEXT + " TEXT, " +
-                    MESSAGES_KEY_TIMESTAMP + "INTEGER" +
+                    MESSAGES_KEY_TIMESTAMP + " INTEGER" +
                     ");";
 
     Context context;
 
-    private static final int defaultId = -1;
+    public static final int defaultId = -1;
+
+    private static CommunicationDatabaseHelper instance;
+
+    public static synchronized CommunicationDatabaseHelper getHelper(Context context) {
+        if (instance == null)
+            instance = new CommunicationDatabaseHelper(context);
+
+        return instance;
+    }
 
     public CommunicationDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -135,18 +139,15 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
 
-                int idIndex = cursor.getColumnIndex(this.CONTACT_KEY_ID);
                 int firstNameIndex = cursor.getColumnIndex(this.CONTACT_KEY_FIRST_NAME);
                 int lastNameIndex = cursor.getColumnIndex(this.CONTACT_KEY_LAST_NAME);
 
                 do {
                     Contact contact = new Contact();
 
-                    int id = cursor.getInt(idIndex);
                     String firstName = cursor.getString(firstNameIndex);
                     String lastName = cursor.getString(lastNameIndex);
 
-                    contact.setId(id);
                     contact.setFirstName(firstName);
                     contact.setLastName(lastName);
 
@@ -195,32 +196,37 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public List<Chat> getChats() {
+        List<Chat> chats = new ArrayList<Chat>();
+
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = null;
 
-        List<Chat> chats = new ArrayList<Chat>();
-
         try {
             db.beginTransaction();
 
-            cursor = db.query(this.CONTACT_TABLE_NAME, null, null, null, null, null, null);
+            cursor = db.query(this.CHAT_TABLE_NAME, null, null, null, null, null, null);
 
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
 
                 int idIndex = cursor.getColumnIndex(this.CHAT_KEY_ID);
-                int nameIndex = cursor.getColumnIndex(this.CHAT_KEY_NAME);
+                int resourceIndex = cursor.getColumnIndex(this.CHAT_KEY_RESOURCE);
 
                 do {
                     Chat chat = new Chat();
 
                     int id = cursor.getInt(idIndex);
-                    String name = cursor.getString(nameIndex);
+                    String resource = cursor.getString(resourceIndex);
 
                     chat.setId(id);
-                    chat.setName(name);
-                    chat.setMessageList(getChatMessages(chat));
+                    chat.setResource(resource);
+
+                    // get participants
+                    chat.setParticipantList(getParticipants(chat));
+
+                    // get chat messages
+                    chat.setMessageList(getChatMessages(id));
 
                     chats.add(chat);
 
@@ -229,12 +235,54 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
             }
 
             db.setTransactionSuccessful();
-        } finally {
+        }  finally {
             db.endTransaction();
             db.close();
         }
 
+        //List<Chat> chats = new ArrayList<Chat>();
+
+        //chats.add(new Chat("abcdefg"));
+
         return chats;
+    }
+
+    private List<String> getParticipants(Chat chat) {
+        List<String> participantsList = new ArrayList<String>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String where = this.CHAT_PARTICIPANTS_FOREIGN_KEY_CHAT_ID + " = ?";
+        String[] args = {String.valueOf(chat.getId())};
+
+        Cursor cursor = null;
+
+        try {
+            db.beginTransaction();
+
+            cursor = db.query(this.CHAT_PARTICIPANTS_TABLE_NAME, null, where, args, null, null, null);
+
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                int contactUsernameIndex = cursor.getColumnIndex(this.CHAT_PARTICIPANTS_FOREIGN_KEY_CONTACT_USERNAME);
+
+                do {
+                    participantsList.add(cursor.getString(contactUsernameIndex));
+
+                    cursor.moveToNext();
+                } while (!cursor.isAfterLast());
+            }
+
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            participantsList.add(e.toString());
+        } finally {
+            db.endTransaction();
+            //db.close();
+        }
+
+        return participantsList;
     }
 
     public int addChat(Chat chat) {
@@ -245,11 +293,22 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
         try {
             db.beginTransaction();
 
+            // Add chat to database
             ContentValues cv = new ContentValues();
 
-            cv.put(this.CHAT_KEY_NAME, chat.getName());
+            cv.put(this.CHAT_KEY_RESOURCE, chat.getResource());
 
             lastId = (int) db.insert(this.CHAT_TABLE_NAME, null, cv);
+
+            // Add participants to database
+            for (String participant : chat.getParticipantList()) {
+                ContentValues cvParticipants = new ContentValues();
+
+                cvParticipants.put(this.CHAT_PARTICIPANTS_FOREIGN_KEY_CHAT_ID, lastId);
+                cvParticipants.put(this.CHAT_PARTICIPANTS_FOREIGN_KEY_CONTACT_USERNAME, participant);
+
+                db.insert(this.CHAT_PARTICIPANTS_TABLE_NAME, null, cvParticipants);
+            }
 
             db.setTransactionSuccessful();
         } finally {
@@ -260,7 +319,7 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
         return lastId;
     }
 
-    public List<Message> getChatMessages(Chat chat) {
+    public List<Message> getChatMessages(int chatId) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = null;
@@ -271,7 +330,7 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
             db.beginTransaction();
 
             String where = this.MESSAGES_FOREIGN_KEY_CHAT_ID + " = ?";
-            String[] args = {String.valueOf(chat.getId())};
+            String[] args = {String.valueOf(chatId)};
             String order = this.MESSAGES_KEY_TIMESTAMP + " ASC";
 
             cursor = db.query(this.MESSAGE_TABLE_NAME, null, where, args, null, null, order);
@@ -279,23 +338,20 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
 
-                int idIndex = cursor.getColumnIndex(this.MESSAGES_KEY_ID);
-                int fkContactIdIndex = cursor.getColumnIndex(this.MESSAGES_FOREIGN_KEY_CONTACT_ID);
+                int fromIndex = cursor.getColumnIndex(this.MESSAGES_FOREIGN_KEY_USERNAME);
                 int timestampIndex = cursor.getColumnIndex(this.MESSAGES_KEY_TIMESTAMP);
                 int textIndex = cursor.getColumnIndex(this.MESSAGES_KEY_TEXT);
 
                 do {
                     Message message = new Message();
 
-                    int id = cursor.getInt(idIndex);
-                    int fkContactId = cursor.getInt(fkContactIdIndex);
-                    int timestamp = cursor.getInt(timestampIndex);
+                    long timestamp = cursor.getLong(timestampIndex);
                     String text = cursor.getString(textIndex);
+                    String from = cursor.getString(fromIndex);
 
-                    message.setId(id);
-                    message.setSender(null);
                     message.setTimestamp(timestamp);
                     message.setText(text);
+                    message.setFrom(from);
 
                     messages.add(message);
 
@@ -306,10 +362,35 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
-            db.close();
         }
 
         return messages;
+    }
+
+    public int addMessage(Message message) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        int lastId = defaultId;
+
+        try {
+            db.beginTransaction();
+
+            ContentValues cv = new ContentValues();
+
+            cv.put(this.MESSAGES_FOREIGN_KEY_CHAT_ID, message.getChatId());
+            cv.put(this.MESSAGES_FOREIGN_KEY_USERNAME, message.getFrom());
+            cv.put(this.MESSAGES_KEY_TEXT, message.getText());
+            cv.put(this.MESSAGES_KEY_TIMESTAMP, Util.getTimestamp());
+
+            db.insert(this.MESSAGE_TABLE_NAME, null, cv);
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+
+        return lastId;
     }
 
     public int addChatMessage(Chat chat, Message message) {
@@ -323,7 +404,6 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
             ContentValues cv = new ContentValues();
 
             cv.put(this.MESSAGES_FOREIGN_KEY_CHAT_ID, chat.getId());
-            cv.put(this.MESSAGES_FOREIGN_KEY_CONTACT_ID, message.getSender().getId());
             cv.put(this.MESSAGES_KEY_TEXT, message.getText());
             cv.put(this.MESSAGES_KEY_TIMESTAMP, Util.getTimestamp());
 
@@ -336,5 +416,85 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
         }
 
         return lastId;
+    }
+
+    public int chatExists(Chat chat) {
+        int chatId = defaultId;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+
+        String where = this.CHAT_KEY_RESOURCE + " = ?";
+        String[] args = {chat.getResource()};
+
+        try {
+            db.beginTransaction();
+
+            cursor = db.query(this.CHAT_TABLE_NAME, null, where, args, null, null, null);
+
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                int idIndex = cursor.getColumnIndex(this.CHAT_KEY_ID);
+
+                chatId = cursor.getInt(idIndex);
+            }
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+
+        return chatId;
+    }
+
+    public List<Message> getAllMessages() {
+        List<Message> messages = new ArrayList<Message>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+
+        try {
+            db.beginTransaction();
+
+            cursor = db.query(this.MESSAGE_TABLE_NAME, null, null, null, null, null, null);
+
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                int chatIdIndex = cursor.getColumnIndex(this.MESSAGES_FOREIGN_KEY_CHAT_ID);
+                int fromIndex = cursor.getColumnIndex(this.MESSAGES_FOREIGN_KEY_USERNAME);
+                int timestampIndex = cursor.getColumnIndex(this.MESSAGES_KEY_TIMESTAMP);
+                int textIndex = cursor.getColumnIndex(this.MESSAGES_KEY_TEXT);
+
+                do {
+                    Message message = new Message();
+
+                    int chatId = cursor.getInt(chatIdIndex);
+                    String from = cursor.getString(fromIndex);
+                    long timestamp = cursor.getLong(timestampIndex);
+                    String text = cursor.getString(textIndex);
+
+                    message.setChatId(chatId);
+                    message.setFrom(from);
+                    message.setTimestamp(timestamp);
+                    message.setText(text);
+
+                    messages.add(message);
+
+                    cursor.moveToNext();
+                } while (!cursor.isAfterLast());
+            }
+
+            db.setTransactionSuccessful();
+        }  finally {
+            db.endTransaction();
+            db.close();
+        }
+
+        return messages;
     }
 }

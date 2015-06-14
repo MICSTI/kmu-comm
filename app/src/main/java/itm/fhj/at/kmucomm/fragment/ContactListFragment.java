@@ -68,7 +68,8 @@ public class ContactListFragment extends Fragment {
         rLayout = (RelativeLayout) inflater.inflate(R.layout.fragment_contact_list, container, false);
 
         // array list containing all contacts to be displayed
-        contacts = ContactProvider.getInstance().getContacts();
+        //contacts = ContactProvider.getInstance().getContacts();
+        contacts = new ArrayList<Contact>();
 
         // get list view
         contactList = (ListView) rLayout.findViewById(R.id.contact_list);

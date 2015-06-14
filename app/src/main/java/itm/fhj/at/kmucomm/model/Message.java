@@ -10,7 +10,8 @@ public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private int id;
-    private Contact sender;
+    private int chatId;
+    private String from;
     private long timestamp;
     private String text;
 
@@ -42,12 +43,20 @@ public class Message implements Serializable {
         this.text = text;
     }
 
-    public Contact getSender() {
-        return sender;
+    public String getFrom() {
+        return from;
     }
 
-    public void setSender(Contact sender) {
-        this.sender = sender;
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    public int getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(int chatId) {
+        this.chatId = chatId;
     }
 
     @Override
@@ -59,7 +68,7 @@ public class Message implements Serializable {
 
         if (id != message.id) return false;
         if (timestamp != message.timestamp) return false;
-        if (!sender.equals(message.sender)) return false;
+        if (!from.equals(message.from)) return false;
 
         return true;
     }

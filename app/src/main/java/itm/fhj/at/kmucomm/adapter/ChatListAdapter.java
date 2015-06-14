@@ -39,9 +39,9 @@ public class ChatListAdapter extends ArrayAdapter<Chat> {
         TextView chatLastMessageTimestamp = (TextView) convertView.findViewById(R.id.chatTime);
 
         // add the values to the views
-        chatName.setText(chat.getName());
-        chatLastMessageText.setText(chat.getLastMessageText());
-        chatLastMessageTimestamp.setText(Util.getTextualTime(chat.getLastMessageTimestamp()));
+        chatName.setText(Util.getCamelCase(chat.getResource()));
+        chatLastMessageText.setText(Util.getCamelCase(chat.getLastMessageText()));
+        chatLastMessageTimestamp.setText(Util.getTime(chat.getLastMessageTimestamp()));
 
         // return the completed view to render on screen
         return convertView;

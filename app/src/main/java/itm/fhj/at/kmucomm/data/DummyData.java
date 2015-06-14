@@ -23,7 +23,6 @@ public class DummyData implements DataInterface {
         contacts = new ArrayList<Contact>();
 
         Contact flo = new Contact();
-        flo.setId(1);
         flo.setUsername("mayerhofer13");
         flo.setFirstName("Florian");
         flo.setLastName("Mayerhofer");
@@ -31,21 +30,18 @@ public class DummyData implements DataInterface {
         flo.setEmail("florian.mayerhofer@edu.fh-joanneum.at");
 
         Contact andi = new Contact();
-        andi.setId(2);
         andi.setUsername("hoeffernig13");
         andi.setFirstName("Andreas");
         andi.setLastName("Höffernig");
         andi.setDepartment("ITM");
 
         Contact kevin = new Contact();
-        kevin.setId(3);
         kevin.setUsername("pfeifer13");
         kevin.setFirstName("Kevin");
         kevin.setLastName("Pfeifer");
         kevin.setDepartment("ITM");
 
         Contact michi = new Contact();
-        michi.setId(4);
         michi.setUsername("stifter13");
         michi.setFirstName("Michael");
         michi.setLastName("Stifter");
@@ -62,20 +58,19 @@ public class DummyData implements DataInterface {
         chats = new ArrayList<Chat>();
 
         Chat kmu = new Chat();
-        kmu.setId(1);
-        kmu.setName("KMU Group Chat");
+        //kmu.setId("KMU Group Chat");
 
         List<Message> kmuMessages = new ArrayList<Message>();
 
         Message msg1 = new Message();
         msg1.setId(1);
-        msg1.setSender(flo);
+        //msg1.setSender(flo);
         msg1.setText("First chat message");
         msg1.setTimestamp(1);
 
         Message msg2 = new Message();
         msg2.setId(2);
-        msg2.setSender(michi);
+        //msg2.setSender(michi);
         msg2.setText("Second chat message");
         msg2.setTimestamp(2);
 
@@ -85,14 +80,13 @@ public class DummyData implements DataInterface {
         kmu.setMessageList(kmuMessages);
 
         Chat itm = new Chat();
-        itm.setId(2);
-        itm.setName("ITM13 Chat");
+        //itm.setId("ITM13 Chat");
 
         List<Message> itmMessages = new ArrayList<Message>();
 
         Message msg3 = new Message();
         msg3.setId(3);
-        msg3.setSender(andi);
+        //msg3.setSender(andi);
         msg3.setText("Morgen ist frei!");
         msg3.setTimestamp(3);
 
