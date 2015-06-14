@@ -44,6 +44,7 @@ public class ChatService {
     private static ChatService instance;
 
     private static MainActivity mActivity;
+    private static ChatDetailActivity cdActivity;
 
     private static SQLiteData db;
 
@@ -118,6 +119,9 @@ public class ChatService {
                                 db.incomingMessage(chatId, Util.getUsernameFromResource(message.getFrom()), message.getBody());
 
                                 updateChatList();
+
+                                if (cdActivity != null)
+                                    updateMessageList();
                             }
                         }
                     });
@@ -229,6 +233,19 @@ public class ChatService {
 
     public SQLiteData getDb() {
         return db;
+    }
+
+    public static void setChatDetailActivity(ChatDetailActivity chatDetailActivity) {
+        cdActivity = chatDetailActivity;
+    }
+
+    private void updateMessageList() {
+        cdActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                cdActivity.updateMessageList();
+            }
+        });
     }
 
 }

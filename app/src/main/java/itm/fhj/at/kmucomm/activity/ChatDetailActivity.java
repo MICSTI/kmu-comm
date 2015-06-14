@@ -15,11 +15,13 @@ import android.widget.ListView;
 import java.util.List;
 
 import itm.fhj.at.kmucomm.R;
+import itm.fhj.at.kmucomm.adapter.ChatListAdapter;
 import itm.fhj.at.kmucomm.adapter.MessageListAdapter;
 import itm.fhj.at.kmucomm.data.DummyDataAccessor;
 import itm.fhj.at.kmucomm.model.Chat;
 import itm.fhj.at.kmucomm.model.Contact;
 import itm.fhj.at.kmucomm.model.Message;
+import itm.fhj.at.kmucomm.util.CommunicationDatabaseHelper;
 import itm.fhj.at.kmucomm.util.Config;
 import itm.fhj.at.kmucomm.util.Util;
 import itm.fhj.at.kmucomm.xmpp.ChatService;
@@ -47,6 +49,9 @@ public class ChatDetailActivity extends ActionBarActivity {
 
         // make sure keyboard is not displayed at first
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        // add reference to ChatService to receive live updates of incoming messages
+        ChatService.getInstance().setChatDetailActivity(this);
 
         // get list view
         messageListView = (ListView) findViewById(R.id.message_list);
@@ -131,5 +136,14 @@ public class ChatDetailActivity extends ActionBarActivity {
     public void onBackPressed() {
         setResult(RESULT_OK);
         finish();
+    }
+
+    public void updateMessageList() {
+        // clear adapter and set it up again
+        ((ArrayAdapter<Object>) messageListView.getAdapter()).clear();
+        messageListAdapter = new MessageListAdapter(this, CommunicationDatabaseHelper.getHelper(this).getChatMessages(chat.getId()));
+
+        // set adapter
+        messageListView.setAdapter(messageListAdapter);
     }
 }
