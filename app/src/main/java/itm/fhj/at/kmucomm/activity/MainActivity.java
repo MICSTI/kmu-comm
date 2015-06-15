@@ -64,7 +64,7 @@ public class MainActivity extends ActionBarActivity implements
     ChatListFragment chatListFragment;
     ContactListFragment contactListFragment;
 
-    public static boolean STATUS_APPEND = true;
+    public static boolean STATUS_APPEND = false;
     private StringBuilder statusBuilder;
     private TextView statusTxt;
 
@@ -290,6 +290,20 @@ public class MainActivity extends ActionBarActivity implements
         contactDetailIntent.putExtra(ContactDetailActivity.EXTRA_MESSAGE, selectedContact);
 
         startActivityForResult(contactDetailIntent, ContactDetailActivity.REQUEST_CODE_CONTACT_DETAIL);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (!ChatService.isConnected && !ChatService.isConnecting) {
+            ChatService.getInstance().connect(new ChatService.XMPPActionListener() {
+                @Override
+                public void onUpdated(String msg) {
+
+                }
+            });
+        }
     }
 
     public void openSettings() {

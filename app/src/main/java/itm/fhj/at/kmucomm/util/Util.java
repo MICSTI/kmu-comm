@@ -50,7 +50,7 @@ public class Util {
 
     public static String getCamelCase(String text) {
         if (text.length() > 0)
-            return text.toUpperCase().substring(0, 1) + text.toLowerCase().substring(1);
+            return text.toUpperCase().substring(0, 1) + text.substring(1);
 
         return text;
     }

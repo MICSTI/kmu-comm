@@ -74,6 +74,9 @@ public class ChatService {
 
     private AbstractXMPPConnection connection;
 
+    public static boolean isConnecting = true;
+    public static boolean isConnected = false;
+
     private static String AUTH_USERNAME = "";
     private static String AUTH_PASSWORD = "";
 
@@ -95,6 +98,9 @@ public class ChatService {
 
         try {
             connection.connect().login();
+
+            isConnecting = false;
+            isConnected = true;
 
             // send new status message
             setStatusText(MSG_USER_LOGGED_IN + AUTH_USERNAME);
@@ -158,8 +164,6 @@ public class ChatService {
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
-        //Chat bobChat = chatManager.createChat("bob2@projmgmt");
-        //bobChat.sendMessage("Sent from app");
     }
 
     public void connect(XMPPActionListener listener) {
