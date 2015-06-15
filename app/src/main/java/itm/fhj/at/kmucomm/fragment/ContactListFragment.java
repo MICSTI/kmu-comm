@@ -1,7 +1,9 @@
 package itm.fhj.at.kmucomm.fragment;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -22,10 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import itm.fhj.at.kmucomm.R;
+import itm.fhj.at.kmucomm.activity.MainActivity;
 import itm.fhj.at.kmucomm.adapter.ContactListAdapter;
+import itm.fhj.at.kmucomm.adapter.MessageListAdapter;
 import itm.fhj.at.kmucomm.api.ContactProvider;
 import itm.fhj.at.kmucomm.data.DummyDataAccessor;
 import itm.fhj.at.kmucomm.model.Contact;
+import itm.fhj.at.kmucomm.util.CommunicationDatabaseHelper;
 
 
 public class ContactListFragment extends Fragment {
@@ -42,8 +47,15 @@ public class ContactListFragment extends Fragment {
 
     private ContactListAdapter contactListAdapter;
 
-    public static ContactListFragment newInstance() {
+    private static MainActivity mainActivity;
+
+    private static ContactProvider contactProvider;
+
+    public static ContactListFragment newInstance(MainActivity ma) {
         ContactListFragment fragment = new ContactListFragment();
+
+        mainActivity = ma;
+        contactProvider = ContactProvider.getInstance(mainActivity.getApplicationContext());
 
         Bundle args = new Bundle();
 
@@ -68,8 +80,7 @@ public class ContactListFragment extends Fragment {
         rLayout = (RelativeLayout) inflater.inflate(R.layout.fragment_contact_list, container, false);
 
         // array list containing all contacts to be displayed
-        //contacts = ContactProvider.getInstance().getContacts();
-        contacts = new ArrayList<Contact>();
+        contacts = contactProvider.getContacts();
 
         // get list view
         contactList = (ListView) rLayout.findViewById(R.id.contact_list);
@@ -96,10 +107,10 @@ public class ContactListFragment extends Fragment {
 
         if (networkInfo != null && networkInfo.isConnected()) {
             // get contacts from rest api
-            ContactProvider.getInstance().update(new ContactProvider.ContactActionListener() {
+            contactProvider.update(new ContactProvider.ContactActionListener() {
                 @Override
-                public void onUpdated(String s) {
-                    contacts = ContactProvider.getInstance().getContacts();
+                public void onUpdated(final String s) {
+                    contacts = contactProvider.getContacts();
 
                     // update contact list view
                     ((ArrayAdapter<Object>) contactList.getAdapter()).notifyDataSetChanged();

@@ -139,17 +139,29 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
 
+                int usernameIndex = cursor.getColumnIndex(this.CONTACT_KEY_USERNAME);
                 int firstNameIndex = cursor.getColumnIndex(this.CONTACT_KEY_FIRST_NAME);
                 int lastNameIndex = cursor.getColumnIndex(this.CONTACT_KEY_LAST_NAME);
+                int departmentIndex = cursor.getColumnIndex(this.CONTACT_KEY_DEPARTMENT);
+                int emailIndex = cursor.getColumnIndex(this.CONTACT_KEY_EMAIL);
+                int phoneIndex = cursor.getColumnIndex(this.CONTACT_KEY_PHONE);
 
                 do {
                     Contact contact = new Contact();
 
+                    String username = cursor.getString(usernameIndex);
                     String firstName = cursor.getString(firstNameIndex);
                     String lastName = cursor.getString(lastNameIndex);
+                    String email = cursor.getString(emailIndex);
+                    String phone = cursor.getString(phoneIndex);
+                    String department = cursor.getString(departmentIndex);
 
+                    contact.setUsername(username);
                     contact.setFirstName(firstName);
                     contact.setLastName(lastName);
+                    contact.setEmail(email);
+                    contact.setPhone(phone);
+                    contact.setDepartment(department);
 
                     contacts.add(contact);
 
@@ -179,12 +191,12 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
             cv.put(this.CONTACT_KEY_USERNAME, contact.getUsername());
             cv.put(this.CONTACT_KEY_FIRST_NAME, contact.getFirstName());
             cv.put(this.CONTACT_KEY_LAST_NAME, contact.getLastName());
-            cv.put(this.CONTACT_KEY_PASSWORD, contact.getPassword());
+            //cv.put(this.CONTACT_KEY_PASSWORD, contact.getPassword());
             cv.put(this.CONTACT_KEY_DEPARTMENT, contact.getDepartment());
             cv.put(this.CONTACT_KEY_PHONE, contact.getPhone());
             cv.put(this.CONTACT_KEY_EMAIL, contact.getEmail());
 
-            lastId = (int) db.insert(this.CONTACT_TABLE_NAME, null, cv);
+            db.insert(this.CONTACT_TABLE_NAME, null, cv);
 
             db.setTransactionSuccessful();
         } finally {
@@ -193,6 +205,36 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
         }
 
         return lastId;
+    }
+
+    public int updateContact(Contact contact) {
+        int result = defaultId;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String where = this.CONTACT_KEY_USERNAME + " = ?";
+        String[] args = {contact.getUsername()};
+
+        try {
+            db.beginTransaction();
+
+            ContentValues cv = new ContentValues();
+
+            cv.put(this.CONTACT_KEY_FIRST_NAME, contact.getFirstName());
+            cv.put(this.CONTACT_KEY_LAST_NAME, contact.getLastName());
+            cv.put(this.CONTACT_KEY_DEPARTMENT, contact.getDepartment());
+            cv.put(this.CONTACT_KEY_PHONE, contact.getPhone());
+            cv.put(this.CONTACT_KEY_EMAIL, contact.getEmail());
+
+            db.update(this.CONTACT_TABLE_NAME, cv, where, args);
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+
+        return result;
     }
 
     public List<Chat> getChats() {
@@ -448,6 +490,34 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
         }
 
         return chatId;
+    }
+
+    public boolean contactExists(Contact contact) {
+        boolean exists = false;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+
+        String where = this.CONTACT_KEY_USERNAME + " = ?";
+        String[] args = {contact.getUsername()};
+
+        try {
+            db.beginTransaction();
+
+            cursor = db.query(this.CONTACT_TABLE_NAME, null, where, args, null, null, null);
+
+            if (cursor.getCount() > 0) {
+                exists = true;
+            }
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+
+        return exists;
     }
 
     public List<Message> getAllMessages() {

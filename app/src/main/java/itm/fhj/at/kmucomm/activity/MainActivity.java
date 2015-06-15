@@ -136,7 +136,7 @@ public class MainActivity extends ActionBarActivity implements
 
         // get instances of ChatListFragment and ContactListFragment
         chatListFragment = ChatListFragment.newInstance();
-        contactListFragment = ContactListFragment.newInstance();
+        contactListFragment = ContactListFragment.newInstance(this);
     }
 
 

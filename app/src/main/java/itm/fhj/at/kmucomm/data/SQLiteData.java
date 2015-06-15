@@ -56,6 +56,10 @@ public class SQLiteData implements DataInterface {
         addMessage(message);
     }
 
+    public void incomingContact(Contact contact) {
+
+    }
+
     @Override
     public List<Contact> getContacts() {
         return cdh.getContacts();
