@@ -54,4 +54,13 @@ public class Util {
 
         return text;
     }
+
+    public static String getFirstName(String name) {
+        int atPosition = name.indexOf(" ");
+
+        if (atPosition > 0)
+            return name.substring(0, atPosition);
+
+        return "";
+    }
 }

@@ -3,14 +3,19 @@ package itm.fhj.at.kmucomm.activity;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -63,7 +68,7 @@ public class ChatDetailActivity extends ActionBarActivity {
         chat = (Chat) getIntent().getSerializableExtra(EXTRA_MESSAGE);
 
         // set activity title to chat name
-        setTitle(Util.getCamelCase(chat.getResource()));
+        setTitle(CommunicationDatabaseHelper.getHelper(getApplicationContext()).getNameByUsername(chat.getResource()));
 
         // message list
         messageList = chat.getMessageList();
@@ -77,36 +82,58 @@ public class ChatDetailActivity extends ActionBarActivity {
         // add onclick listener for adding new message button
         final Button btnSave = (Button) findViewById(R.id.btn_save);
 
+        messageText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    sendMessage();
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Message newMessage = new Message();
-
-                newMessage.setChatId(chat.getId());
-                newMessage.setText(messageText.getText().toString());
-                newMessage.setFrom(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("username", ""));
-                newMessage.setTimestamp(Util.getTimestamp());
-
-                // send message via xmpp
-                ChatService chatService = ChatService.getInstance();
-                chatService.sendMessage(chat.getParticipantList().get(0), newMessage.getText());
-
-                // add message to local database
-                chatService.getDb().addMessage(newMessage);
-
-                // clear text view for future input
-                messageText.setText("");
-
-                // update message list
-                messageList.add(newMessage);
-
-                // update list view
-                ((ArrayAdapter<Object>) messageListView.getAdapter()).notifyDataSetChanged();
+                // send message only if text is not empty
+                if (!messageText.getText().toString().trim().isEmpty()) {
+                    sendMessage();
+                }
             }
         });
 
         // set focus to edit text
         messageText.requestFocus();
+    }
+
+    private void sendMessage() {
+        Message newMessage = new Message();
+
+        newMessage.setChatId(chat.getId());
+        newMessage.setText(messageText.getText().toString());
+        newMessage.setFrom(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("username", ""));
+        newMessage.setTimestamp(Util.getTimestamp());
+
+        // send message via xmpp
+        ChatService chatService = ChatService.getInstance();
+        chatService.sendMessage(chat.getParticipantList().get(0), newMessage.getText());
+
+        // add message to local database
+        chatService.getDb().addMessage(newMessage);
+
+        // clear text view for future input
+        messageText.setText("");
+
+        // update message list
+        messageList.add(newMessage);
+
+        // update chat list
+        chatService.updateChatList();
+
+        // update message list
+        chatService.updateMessageList();
     }
 
 

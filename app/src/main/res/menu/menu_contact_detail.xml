@@ -2,6 +2,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="itm.fhj.at.dummyapp.activity.ContactDetailActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
+    <item android:id="@+id/action_call"
+        android:icon="@drawable/ic_phone_white_48dp"
+        android:title="@string/lbl_call"
+        app:showAsAction="ifRoom" />
+    <item android:id="@+id/action_mail"
+        android:icon="@drawable/ic_email_white_48dp"
+        android:title="@string/lbl_mail"
+        app:showAsAction="ifRoom" />
+    <item android:id="@+id/action_chat" android:title="@string/action_chat"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>

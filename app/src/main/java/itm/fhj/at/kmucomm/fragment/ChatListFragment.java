@@ -81,8 +81,6 @@ public class ChatListFragment extends Fragment {
             }
         });
 
-        //chatList = CommunicationDatabaseHelper.getHelper(fActivity.getApplicationContext()).getChats();
-
         // create adapter
         chatListAdapter = new ChatListAdapter(fActivity, CommunicationDatabaseHelper.getHelper(fActivity.getApplicationContext()).getChats());
 

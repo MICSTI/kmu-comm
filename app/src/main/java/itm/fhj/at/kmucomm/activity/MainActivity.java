@@ -181,6 +181,8 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public void onDestroy() {
         chatService.closeConnection();
+
+        super.onDestroy();
     }
 
     /**
@@ -295,15 +297,21 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public void onResume() {
         super.onResume();
+    }
 
-        if (!ChatService.isConnected && !ChatService.isConnecting) {
-            ChatService.getInstance().connect(new ChatService.XMPPActionListener() {
-                @Override
-                public void onUpdated(String msg) {
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 
-                }
-            });
-        }
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
     }
 
     public void openSettings() {
@@ -349,6 +357,13 @@ public class MainActivity extends ActionBarActivity implements
         } else {
             statusTxt.setText(text);
         }
+    }
+
+    public void setStatusVisibility(boolean show) {
+        if (show)
+            statusTxt.setVisibility(View.VISIBLE);
+        else
+            statusTxt.setVisibility(View.GONE);
     }
 
     public void updateChatList() {

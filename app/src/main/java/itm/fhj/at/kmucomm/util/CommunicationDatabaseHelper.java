@@ -18,7 +18,7 @@ import itm.fhj.at.kmucomm.model.Message;
  */
 public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 16;
 
     public static final String DATABASE_NAME = "comm4kmu";
 
@@ -178,6 +178,43 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
         return contacts;
     }
 
+    public String getNameByUsername(String username) {
+        String name = "";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String where = this.CONTACT_KEY_USERNAME + " = ?";
+        String[] args = {username};
+
+        Cursor cursor = null;
+
+        try {
+            db.beginTransaction();
+
+            cursor = db.query(this.CONTACT_TABLE_NAME, null, where, args, null, null, null);
+
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                int firstNameIndex = cursor.getColumnIndex(this.CONTACT_KEY_FIRST_NAME);
+                int lastNameIndex = cursor.getColumnIndex(this.CONTACT_KEY_LAST_NAME);
+
+                if (cursor.getCount() > 0) {
+                    cursor.moveToFirst();
+
+                    name = cursor.getString(firstNameIndex) + " " + cursor.getString(lastNameIndex);
+                }
+
+                db.setTransactionSuccessful();
+            }
+        }  finally {
+            db.endTransaction();
+            db.close();
+        }
+
+        return name;
+    }
+
     public int addContact(Contact contact) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -289,6 +326,49 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
         return chats;
     }
 
+    public Chat getChatById(int chatId) {
+        Chat chat = new Chat();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String where = this.CHAT_KEY_ID + " = ?";
+        String[] args = {String.valueOf(chatId)};
+
+        Cursor cursor = null;
+
+        try {
+            db.beginTransaction();
+
+            cursor = db.query(this.CHAT_TABLE_NAME, null, where, args, null, null, null);
+
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                int idIndex = cursor.getColumnIndex(this.CHAT_KEY_ID);
+                int resourceIndex = cursor.getColumnIndex(this.CHAT_KEY_RESOURCE);
+
+                int id = cursor.getInt(idIndex);
+                String resource = cursor.getString(resourceIndex);
+
+                chat.setId(id);
+                chat.setResource(resource);
+
+                // get participants
+                chat.setParticipantList(getParticipants(chat));
+
+                // get chat messages
+                chat.setMessageList(getChatMessages(id));
+            }
+
+            db.setTransactionSuccessful();
+        }  finally {
+            db.endTransaction();
+            db.close();
+        }
+
+        return chat;
+    }
+
     private List<String> getParticipants(Chat chat) {
         List<String> participantsList = new ArrayList<String>();
 
@@ -355,7 +435,7 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
-            db.close();
+            //db.close();
         }
 
         return lastId;
@@ -407,6 +487,54 @@ public class CommunicationDatabaseHelper extends SQLiteOpenHelper {
         }
 
         return messages;
+    }
+
+    public Chat findOrCreateChatByResource(String resource) {
+        Chat chat = new Chat();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+
+        String where = this.CHAT_KEY_RESOURCE + " = ?";
+        String[] args = {resource};
+
+        try {
+            db.beginTransaction();
+
+            cursor = db.query(this.CHAT_TABLE_NAME, null, where, args, null, null, null);
+
+            if (cursor.getCount() > 0) {
+                // find chat
+                cursor.moveToFirst();
+
+                int idIndex = cursor.getColumnIndex(this.CHAT_KEY_ID);
+
+                int id = cursor.getInt(idIndex);
+
+                chat.setId(id);
+                chat.setResource(resource);
+
+                // get participants
+                chat.setParticipantList(getParticipants(chat));
+
+                // get chat messages
+                chat.setMessageList(getChatMessages(id));
+            } else {
+                // create chat
+                chat.setId(addChat(chat));
+                chat.setResource(resource);
+                chat.setMessageList(new ArrayList<Message>());
+                chat.setParticipantList(getParticipants(chat));
+            }
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+
+        return chat;
     }
 
     public int addMessage(Message message) {

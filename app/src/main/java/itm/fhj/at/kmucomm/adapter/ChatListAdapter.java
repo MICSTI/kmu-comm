@@ -13,6 +13,8 @@ import java.util.List;
 
 import itm.fhj.at.kmucomm.R;
 import itm.fhj.at.kmucomm.model.Chat;
+import itm.fhj.at.kmucomm.model.Message;
+import itm.fhj.at.kmucomm.util.CommunicationDatabaseHelper;
 import itm.fhj.at.kmucomm.util.Util;
 
 /**
@@ -40,16 +42,26 @@ public class ChatListAdapter extends ArrayAdapter<Chat> {
         TextView chatLastMessageTimestamp = (TextView) convertView.findViewById(R.id.chatTime);
 
         // add the values to the views
-        chatName.setText(Util.getCamelCase(chat.getResource()));
+        chatName.setText(CommunicationDatabaseHelper.getHelper(getContext()).getNameByUsername(chat.getResource()));
 
         // if last message was sent by yourself, show "You" instead of username
-        if (chat.getLastMessage().getFrom().equals(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("username", ""))) {
-            chatLastMessageText.setText("You: " + chat.getLastMessage().getText());
+        Message lastMessage = chat.getLastMessage();
+
+        if (lastMessage != null) {
+            if (chat.getLastMessage().getFrom().equals(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("username", ""))) {
+                chatLastMessageText.setText("You: " + chat.getLastMessage().getText());
+            } else {
+                chatLastMessageText.setText(Util.getFirstName(CommunicationDatabaseHelper.getHelper(getContext()).getNameByUsername(lastMessage.getFrom())) + ": " + lastMessage.getText());
+            }
         } else {
-            chatLastMessageText.setText(Util.getCamelCase(chat.getLastMessageText()));
+            // displays "no message"
+            chatLastMessageText.setText("No message");
         }
 
-        chatLastMessageTimestamp.setText(Util.getTime(chat.getLastMessageTimestamp()));
+        if (chat.getLastMessageTimestamp() > 0)
+            chatLastMessageTimestamp.setText(Util.getTime(chat.getLastMessageTimestamp()));
+        else
+            chatLastMessageTimestamp.setText("");
 
         // return the completed view to render on screen
         return convertView;

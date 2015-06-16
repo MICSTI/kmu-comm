@@ -1,6 +1,7 @@
 package itm.fhj.at.kmucomm.adapter;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import itm.fhj.at.kmucomm.R;
 import itm.fhj.at.kmucomm.model.Message;
+import itm.fhj.at.kmucomm.util.CommunicationDatabaseHelper;
 import itm.fhj.at.kmucomm.util.Util;
 
 /**
@@ -37,9 +39,22 @@ public class MessageListAdapter extends ArrayAdapter<Message> {
         TextView messageTime = (TextView) convertView.findViewById(R.id.messageTime);
 
         // add the values to the views
-        messageContactName.setText(Util.getCamelCase(message.getFrom()));
+        String contactName;
+
+        if (message.getFrom().equals(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("username", ""))) {
+            contactName = "You";
+        } else {
+            contactName = CommunicationDatabaseHelper.getHelper(getContext()).getNameByUsername(message.getFrom());
+        }
+
+        messageContactName.setText(contactName);
         messageText.setText(message.getText());
-        messageTime.setText(Util.getTime(message.getTimestamp()));
+
+        if (message.getTimestamp() > 0)
+            messageTime.setText(Util.getTime(message.getTimestamp()));
+        else {
+            messageTime.setText("");
+        }
 
         // return the completed view to render on screen
         return convertView;

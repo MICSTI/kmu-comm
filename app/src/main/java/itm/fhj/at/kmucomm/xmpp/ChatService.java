@@ -104,6 +104,7 @@ public class ChatService {
 
             // send new status message
             setStatusText(MSG_USER_LOGGED_IN + AUTH_USERNAME);
+            setStatusVisibility(false);
 
             // Register listeners for chats and messages
             chatManager = ChatManager.getInstanceFor(connection);
@@ -124,7 +125,8 @@ public class ChatService {
                             if (message.getBody() != null) {
                                 db.incomingMessage(chatId, Util.getUsernameFromResource(message.getFrom()), message.getBody());
 
-                                updateChatList();
+                                if (mActivity != null)
+                                    updateChatList();
 
                                 if (cdActivity != null)
                                     updateMessageList();
@@ -136,21 +138,25 @@ public class ChatService {
         } catch (XMPPException e) {
             Log.e(TAG, e.toString());
             setStatusText(e.toString());
+            setStatusVisibility(true);
             //setStatusText(MSG_USER_NOT_LOGGED_IN);
             return MSG_USER_NOT_LOGGED_IN;
         } catch (SmackException e) {
             Log.e(TAG, e.toString());
             setStatusText(e.toString());
+            setStatusVisibility(true);
             //setStatusText(MSG_USER_NOT_LOGGED_IN);
             return MSG_USER_NOT_LOGGED_IN;
         } catch (IOException e) {
             Log.e(TAG, e.toString());
             setStatusText(e.toString());
+            setStatusVisibility(true);
             //setStatusText(MSG_USER_NOT_LOGGED_IN);
             return MSG_USER_NOT_LOGGED_IN;
         } catch (Exception e) {
             Log.e(TAG, e.toString());
             setStatusText(e.toString());
+            setStatusVisibility(true);
             //setStatusText(MSG_USER_NOT_LOGGED_IN);
             return MSG_USER_NOT_LOGGED_IN;
         }
@@ -164,6 +170,10 @@ public class ChatService {
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
+    }
+
+    public void addChatFromApp() {
+
     }
 
     public void connect(XMPPActionListener listener) {
@@ -226,7 +236,16 @@ public class ChatService {
         });
     }
 
-    private void updateChatList() {
+    private void setStatusVisibility(final boolean show) {
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mActivity.setStatusVisibility(show);
+            }
+        });
+    }
+
+    public void updateChatList() {
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -243,7 +262,7 @@ public class ChatService {
         cdActivity = chatDetailActivity;
     }
 
-    private void updateMessageList() {
+    public void updateMessageList() {
         cdActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
